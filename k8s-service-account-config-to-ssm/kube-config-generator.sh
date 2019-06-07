@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # Check if variables is there
 if [[ -z $ROOT_ID || -z $ACCOUNT_ID ]]; then
     echo 'required environment variables missing'
