@@ -1,7 +1,7 @@
 # Generate a service connection kube config and push to SSM
 
 ## Prereqs
-* kubectl
+* kubectl and Hellman admin config
 * jq
 * aws cli
 * prime aws creds
