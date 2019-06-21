@@ -1,7 +1,6 @@
-# Generate a service connection kubernetes configuration and push to AWS Systems Manager Parameter Store
+# Generate a service connection config
 This tool allows for easy creation of a kubernetes configuration file based on a pre-defined template.
-
-After creation of the file the tool automatically provisions the configuration inside of the AWS account specified as the root
+After creation of the file the tool automatically provisions the kubernetes configuration inside of the AWS Systems Manager Parameter Store of the AWS account specified as the Root ID in the script
 
 ## Prerequisites
 * [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/)
