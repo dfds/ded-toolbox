@@ -30,12 +30,12 @@ This approach only sets `kubectl` to use the configuration file for the current 
 3. Get and set the local variables information from **ded-aesir** slack channel
 4. Execute the `./kube-config-generator.sh` script
 
-The script requires two environment variables set.
+The script requires two environment variables set.  
 `ROOT_ID`: Can be found from the **capabilityRootId** field from Harald-notify app in **ded-aesir** slack channel.
 
 `ACCOUNT_ID`: Can be found after the **Tax settings for AWS Account** field from Harald-notify app in **ded-aesir** slack channel. 
 
-The syntax for running the script is:
+The syntax for running the script is:  
 `ROOT_ID=YOUR_CAPABILITY_ROOT_ID ACCOUNT_ID=YOUR_CAPABILITY_AWS_ACCOUNT_ID ./kube-config-generator.sh`
 
 Sample script execution:
