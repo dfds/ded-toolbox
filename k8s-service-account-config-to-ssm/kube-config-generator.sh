@@ -34,4 +34,4 @@ AWS_ASSUMED_SESSION_TOKEN=${AWS_ASSUMED_CREDS[2]}
 
 # Push to AWS parameter store
 AWS_ACCESS_KEY_ID=${AWS_ASSUMED_ACCESS_KEY_ID} AWS_SECRET_ACCESS_KEY=${AWS_ASSUMED_SECRET_ACCESS_KEY} AWS_SESSION_TOKEN=${AWS_ASSUMED_SESSION_TOKEN} \
-    aws ssm put-parameter --name "/managed/kubeconfig" --value "$KUBE_CONFIG" --type "SecureString" --overwrite --region eu-central-1
+    aws ssm put-parameter --name "/managed/deploy/kube-config" --value "$KUBE_CONFIG" --type "SecureString" --overwrite --region eu-central-1
