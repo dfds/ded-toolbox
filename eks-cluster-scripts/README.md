@@ -36,3 +36,7 @@ data:
     xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx=
     -----END CERTIFICATE-----
 ```
+
+## Notes
+Added this as an issue with AWS:
+https://github.com/aws/containers-roadmap/issues/424
