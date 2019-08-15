@@ -1,7 +1,7 @@
 # This script is hardcoded to get the client-ca from hellman
 $Accounts = (aws organizations list-accounts --profile saml) | ConvertFrom-Json 
 
-$Accounts = $Accounts.Accounts | Where-Object {$_.name -match 'oxygen'}
+$Accounts = $Accounts.Accounts
 
 
 foreach ($Account in $Accounts) {
@@ -16,5 +16,5 @@ foreach ($Account in $Accounts) {
     Write-Output "Getting RDS for Account ID: $($Account.ID)"
     Write-Output "Account Name: $($Account.Name)"
 
-    (aws eks describe-cluster --name hellman --region eu-west-1 --output=text --query 'cluster.{certificateAuthorityData: certificateAuthority.data}')
+    aws rds describe-db-instances --query 'DBInstances[*].[DBInstanceArn,Engine,DBInstanceIdentifier]'
 }
