@@ -18,6 +18,8 @@ CAPABILITY_AWS_ROLE_SESSION="kube-config-paramstore"
 kubectl create serviceaccount --namespace kube-system $SERVICE_ACCOUNT_NAME
 kubectl create rolebinding $SERVICE_ACCOUNT_NAME --role=$KUBE_ROLE --serviceaccount=kube-system:$SERVICE_ACCOUNT_NAME -n $NAMESPACE
 KUBE_TOKEN=$(kubectl -n kube-system get secret $(kubectl -n kube-system get secret | grep $SERVICE_ACCOUNT_NAME | awk '{print $1}') -o json | jq '.data.token' | tr -d '"' | base64 --decode)
+#Could be replaced with?:
+#KUBE_TOKEN=$(kubectl -n kube-system get secret $SERVICE_ACCOUNT_NAME -o=jsonpath="{.data.token}" | base64 --decode --ignore-garbage)
 KUBE_CONFIG=$(sed "s/KUBE_TOKEN/${KUBE_TOKEN}/g" config.template | sed "s/NAMESPACE_REPLACE/${NAMESPACE}/g")
 
 # Assume role
