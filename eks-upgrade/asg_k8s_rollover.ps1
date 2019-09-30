@@ -4,6 +4,8 @@ To do:
 - Timeout handling in loops
     - Message
     - Warning or Throw?
+- Tee kubectl drain output
+- Count instances not using current launch config: Only included healthy
 #>
 
 [CmdletBinding()]
@@ -43,7 +45,7 @@ function Get-ASGLaunchConfig {
 
     )
 
-    $LaunchConfig = aws --profile oxygen --region $Region autoscaling describe-auto-scaling-groups --auto-scaling-group-names $AutoScalingGroup --query "AutoScalingGroups[0].LaunchConfigurationName" --output text
+    $LaunchConfig = aws --region $Region autoscaling describe-auto-scaling-groups --auto-scaling-group-names $AutoScalingGroup --query "AutoScalingGroups[0].LaunchConfigurationName" --output text
     Write-Message "The current launch config for autoscaling group '$AutoScalingGroup' in region '$Region' is '$LaunchConfig'"
     Return $LaunchConfig
 
@@ -65,12 +67,13 @@ function Get-ASGInstancesOutdatedLaunchConfig {
 
     )
 
-    $RolloverInstanceQuery = aws --profile oxygen --region $Region autoscaling describe-auto-scaling-instances --query "AutoScalingInstances[?AutoScalingGroupName==``$AutoScalingGroup`` && LaunchConfigurationName!=``$LaunchConfig``].InstanceId" --output text
-    # $RolloverInstanceQuery = aws --profile oxygen --region $Region autoscaling describe-auto-scaling-instances --query "AutoScalingInstances[?AutoScalingGroupName==``$AutoScalingGroup`` && LaunchConfigurationName==``$LaunchConfig``].InstanceId" --output text # debug
+    $RolloverInstanceQuery = aws --region $Region autoscaling describe-auto-scaling-instances --query "AutoScalingInstances[?AutoScalingGroupName==``$AutoScalingGroup`` && LaunchConfigurationName!=``$LaunchConfig``].InstanceId" --output text
+    # $RolloverInstanceQuery = aws --region $Region autoscaling describe-auto-scaling-instances --query "AutoScalingInstances[?AutoScalingGroupName==``$AutoScalingGroup`` && LaunchConfigurationName==``$LaunchConfig``].InstanceId" --output text # debug
 
     If ($RolloverInstanceQuery) {
+        $RolloverInstanceIds = $RolloverInstanceQuery.Split()
         Write-Message "$($RolloverInstanceIds.Count) instance(s) in autoscaling group '$AutoScalingGroup' in region '$Region' are not using current launch config"
-        Return $RolloverInstanceQuery.Split()
+        Return $RolloverInstanceIds
     }
     Else {
         Write-Message "All instances in autoscaling group '$AutoScalingGroup' in region '$Region' appears to be using the current launch config - Nothing to do"
@@ -92,7 +95,7 @@ function Get-InstancePrivateDnsName {
 
     )
 
-    $PrivateDnsName = aws --profile oxygen --region $Region ec2 describe-instances --instance-ids $InstanceId --filter "Name=private-dns-name,Values=*.*" --query "Reservations[].Instances[].PrivateDnsName" --output text 2>&1
+    $PrivateDnsName = aws --region $Region ec2 describe-instances --instance-ids $InstanceId --filter "Name=private-dns-name,Values=*.*" --query "Reservations[].Instances[].PrivateDnsName" --output text 2>&1
 
     If ($?) {
         Write-Message "Instance '$InstanceId' in region '$Region' has a private DNS name of '$PrivateDnsName'"
@@ -177,7 +180,7 @@ function Set-InstanceHealthStatus {
     )
 
     Write-Message "Setting instance '$Id' in region '$Region' to 'Unhealthy'"
-    aws --profile oxygen --region $Region autoscaling set-instance-health --instance-id $Id --health-status $Status
+    aws --region $Region autoscaling set-instance-health --instance-id $Id --health-status $Status
 
 }
 
