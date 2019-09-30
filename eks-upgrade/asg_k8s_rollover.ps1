@@ -6,6 +6,7 @@ To do:
     - Warning or Throw?
     - Fix unschedulable nodes?
 - Count instances not using current launch config: Only included healthy
+- Wait for node: Use ASG instead of Kubectl
 #>
 
 [CmdletBinding()]
@@ -217,19 +218,30 @@ ForEach ($Instance in $RolloverInstances) {
         Set-InstanceHealthStatus -Id $Instance.Id -Region $Region -Status Unhealthy
 
         # Wait for new Kubernetes node to appear
-        $i = 0
+        $DoStart = Get-Date
         Do {
+
+            If (New-TimeSpan $DoStart (Get-Date) | Select -Expand TotalSeconds -ge $NodeLiveTimeout) {
+                Throw "ERROR: Timeout expired waiting for new Kubernets node to join cluster"
+            }
+
             Start-Sleep 5
             $CurrentNodes = Get-KubernetesNodes
             $NewNodes = Compare-Object -ReferenceObject $PreviousNodes -DifferenceObject $CurrentNodes -PassThru
             # $NewNodes = Compare-Object -ReferenceObject $PreviousNodes -DifferenceObject ($CurrentNodes + 'ip-99-99-99-99.eu-west-1.compute.internal') -PassThru # debug
             # $Newnodes = @('ip-10-0-1-237.eu-west-1.compute.internal', 'ip-10-0-1-9.eu-west-1.compute.internal') #debug
         }
-        Until ($NewNodes -or ($i++ -ge 60))
+        Until ($NewNodes)
         Write-Message "New Kubernetes node joined: $($NewNodes -join ', ')"
     
         # Wait for new Kubernetes node to be ready
+        $DoStart = Get-Date
         Do {
+
+            If (New-TimeSpan $DoStart (Get-Date) | Select -Expand TotalSeconds -ge $NodeReadyTimeout) {
+                Throw "ERROR: Timeout expired waiting for new Kubernets node to become Ready"
+            }
+
             Start-Sleep 5
             $NodeStatus = Get-KubernetesNodeReady -Name $NewNodes
         }
