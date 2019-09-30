@@ -4,6 +4,7 @@ To do:
 - Timeout handling in loops
     - Message
     - Warning or Throw?
+    - Fix unschedulable nodes?
 - Count instances not using current launch config: Only included healthy
 #>
 
@@ -218,18 +219,18 @@ ForEach ($Instance in $RolloverInstances) {
         # Wait for new Kubernetes node to appear
         $i = 0
         Do {
-            Start-Sleep 1 # 10
+            Start-Sleep 5
             $CurrentNodes = Get-KubernetesNodes
             $NewNodes = Compare-Object -ReferenceObject $PreviousNodes -DifferenceObject $CurrentNodes -PassThru
             # $NewNodes = Compare-Object -ReferenceObject $PreviousNodes -DifferenceObject ($CurrentNodes + 'ip-99-99-99-99.eu-west-1.compute.internal') -PassThru # debug
             # $Newnodes = @('ip-10-0-1-237.eu-west-1.compute.internal', 'ip-10-0-1-9.eu-west-1.compute.internal') #debug
         }
-        Until ($NewNodes -or ($i++ -ge 3))
+        Until ($NewNodes -or ($i++ -ge 60))
         Write-Message "New Kubernetes node joined: $($NewNodes -join ', ')"
     
         # Wait for new Kubernetes node to be ready
         Do {
-            Start-Sleep 1 # 10
+            Start-Sleep 5
             $NodeStatus = Get-KubernetesNodeReady -Name $NewNodes
         }
         Until ($NodeStatus.Ready -notcontains $false)
