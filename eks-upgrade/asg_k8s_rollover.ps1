@@ -141,7 +141,7 @@ function Set-KubernetesNodeDrain {
 
     Write-Message "Draining Kubernetes node '$Name'"
     
-    $Result = kubectl drain --ignore-daemonsets --delete-local-data --force $Name 2>&1
+    kubectl drain --ignore-daemonsets --delete-local-data --force $Name 2>&1 | Tee-Object -Variable Result
     # $Result = kubectl drain $Name 2>&1 #debug
     # $Result = kubectl version --client #debug
 
