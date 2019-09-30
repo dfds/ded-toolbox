@@ -4,7 +4,6 @@ To do:
 - Timeout handling in loops
     - Message
     - Warning or Throw?
-- Tee kubectl drain output
 - Count instances not using current launch config: Only included healthy
 #>
 
@@ -141,7 +140,7 @@ function Set-KubernetesNodeDrain {
 
     Write-Message "Draining Kubernetes node '$Name'"
     
-    kubectl drain --ignore-daemonsets --delete-local-data --force $Name 2>&1 | Tee-Object -Variable Result | Write-Verbose -Verbose
+    kubectl drain --ignore-daemonsets --delete-local-data --grace-period=30 --timeout=2m --force $Name 2>&1 | Tee-Object -Variable Result | Write-Verbose -Verbose
     # $Result = kubectl drain $Name 2>&1 #debug
     # $Result = kubectl version --client #debug
 
