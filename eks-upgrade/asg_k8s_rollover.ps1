@@ -65,8 +65,8 @@ function Get-ASGInstancesOutdatedLaunchConfig {
 
     )
 
-    # $RolloverInstanceQuery = aws --profile oxygen --region $Region autoscaling describe-auto-scaling-instances --query "AutoScalingInstances[?AutoScalingGroupName==``$AutoScalingGroup`` && LaunchConfigurationName!=``$LaunchConfig``].InstanceId" --output text
-    $RolloverInstanceQuery = aws --profile oxygen --region $Region autoscaling describe-auto-scaling-instances --query "AutoScalingInstances[?AutoScalingGroupName==``$AutoScalingGroup`` && LaunchConfigurationName==``$LaunchConfig``].InstanceId" --output text # debug
+    $RolloverInstanceQuery = aws --profile oxygen --region $Region autoscaling describe-auto-scaling-instances --query "AutoScalingInstances[?AutoScalingGroupName==``$AutoScalingGroup`` && LaunchConfigurationName!=``$LaunchConfig``].InstanceId" --output text
+    # $RolloverInstanceQuery = aws --profile oxygen --region $Region autoscaling describe-auto-scaling-instances --query "AutoScalingInstances[?AutoScalingGroupName==``$AutoScalingGroup`` && LaunchConfigurationName==``$LaunchConfig``].InstanceId" --output text # debug
 
     If ($RolloverInstanceQuery) {
         Write-Message "$($RolloverInstanceIds.Count) instance(s) in autoscaling group '$AutoScalingGroup' in region '$Region' are not using current launch config"
@@ -138,9 +138,9 @@ function Set-KubernetesNodeDrain {
 
     Write-Message "Draining Kubernetes node '$Name'"
     
-    # $Result = kubectl drain --ignore-daemonsets --delete-local-data --force $Name 2>&1
+    $Result = kubectl drain --ignore-daemonsets --delete-local-data --force $Name 2>&1
     # $Result = kubectl drain $Name 2>&1 #debug
-    $Result = kubectl version --client #debug
+    # $Result = kubectl version --client #debug
 
     If ($LASTEXITCODE -ne 0) {
 
@@ -177,7 +177,7 @@ function Set-InstanceHealthStatus {
     )
 
     Write-Message "Setting instance '$Id' in region '$Region' to 'Unhealthy'"
-    # aws --profile oxygen --region $Region autoscaling set-instance-health --instance-id $Id --health-status $Status
+    aws --profile oxygen --region $Region autoscaling set-instance-health --instance-id $Id --health-status $Status
 
 }
 
@@ -218,9 +218,9 @@ ForEach ($Instance in $RolloverInstances) {
         Do {
             Start-Sleep 1 # 10
             $CurrentNodes = Get-KubernetesNodes
-            # $NewNodes = Compare-Object -ReferenceObject $PreviousNodes -DifferenceObject $CurrentNodes -PassThru
+            $NewNodes = Compare-Object -ReferenceObject $PreviousNodes -DifferenceObject $CurrentNodes -PassThru
             # $NewNodes = Compare-Object -ReferenceObject $PreviousNodes -DifferenceObject ($CurrentNodes + 'ip-99-99-99-99.eu-west-1.compute.internal') -PassThru # debug
-            $Newnodes = @('ip-10-0-1-237.eu-west-1.compute.internal', 'ip-10-0-1-9.eu-west-1.compute.internal') #debug
+            # $Newnodes = @('ip-10-0-1-237.eu-west-1.compute.internal', 'ip-10-0-1-9.eu-west-1.compute.internal') #debug
         }
         Until ($NewNodes -or ($i++ -ge 3))
         Write-Message "New Kubernetes node joined: $($NewNodes -join ', ')"
