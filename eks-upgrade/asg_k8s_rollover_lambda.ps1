@@ -4,6 +4,9 @@
 #   $LambdaInput - A PSObject that contains the Lambda function input data.
 #   $LambdaContext - An Amazon.Lambda.Core.ILambdaContext object that contains information about the currently running Lambda environment.
 
+# The last item in the PowerShell pipeline will be returned as the result of the Lambda function.
+
+
 # --------------------------------------------------------------------------------
 # Define variables and oonstants
 # --------------------------------------------------------------------------------

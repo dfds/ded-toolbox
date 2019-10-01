@@ -1,11 +1,5 @@
 #Requires -Modules @{ModuleName='AWSPowerShell.NetCore';ModuleVersion='3.3.590.0'}
 
-# When executing in Lambda the following variables will be predefined.
-#   $LambdaInput - A PSObject that contains the Lambda function input data.
-#   $LambdaContext - An Amazon.Lambda.Core.ILambdaContext object that contains information about the currently running Lambda environment.
-
-# The last item in the PowerShell pipeline will be returned as the result of the Lambda function.
-
 [CmdletBinding()]
 
 
@@ -25,12 +19,20 @@ To do:
 - Wait for node: Use ASG instead of Kubectl
 #>
 
+
+# --------------------------------------------------------------------------------
+# Define variables and oonstants
+# --------------------------------------------------------------------------------
+
 New-Variable -Name NodeLiveTimeout -Value 300 -Option Constant
 New-Variable -Name NodeReadyTimeout -Value 300 -Option Constant
 
+# --------------------------------------------------------------------------------
+# Functions
+# --------------------------------------------------------------------------------
+
 function Write-Message ([string]$Message) {
-    Write-Host "$(Get-Date -Format u)  " -ForegroundColor Blue -NoNewLine
-    Write-Host $Message
+    Write-Host "$(Get-Date -Format u)  $Message"
 }
 
 function Get-ASGLaunchConfig {
@@ -45,7 +47,6 @@ function Get-ASGLaunchConfig {
 
     )
 
-    # $LaunchConfig = aws --region $Region autoscaling describe-auto-scaling-groups --auto-scaling-group-names $AutoScalingGroup --query "AutoScalingGroups[0].LaunchConfigurationName" --output text
     $LaunchConfig = Get-ASAutoScalingGroup -AutoScalingGroupName $AutoScalingGroup -Region $Region | Select -Expand LaunchConfigurationName
     Write-Message "The current launch config for autoscaling group '$AutoScalingGroup' in region '$Region' is '$LaunchConfig'"
     Return $LaunchConfig
@@ -68,13 +69,13 @@ function Get-ASGInstancesOutdatedLaunchConfig {
 
     )
 
-    $RolloverInstanceQuery = aws --region $Region autoscaling describe-auto-scaling-instances --query "AutoScalingInstances[?AutoScalingGroupName==``$AutoScalingGroup`` && LaunchConfigurationName!=``$LaunchConfig``].InstanceId" --output text
-    # $RolloverInstanceQuery = Get-ASAutoScalingInstance...
+    # Get ASG instances not using current launch config
+    $RolloverInstances = Get-ASAutoScalingInstance -Region $Region |
+        Where-Object { $_.AutoScalingGroupName -eq $AutoScalingGroup -and $_.LaunchConfigurationName -ne $LaunchConfig }
 
-    If ($RolloverInstanceQuery) {
-        $RolloverInstanceIds = $RolloverInstanceQuery.Split()
-        Write-Message "$($RolloverInstanceIds.Count) instance(s) in autoscaling group '$AutoScalingGroup' in region '$Region' are not using current launch config"
-        Return $RolloverInstanceIds
+    If ($RolloverInstances) {
+        Write-Message "$($RolloverInstances.Count) instance(s) in autoscaling group '$AutoScalingGroup' in region '$Region' are not using current launch config"
+        Return $RolloverInstances
     }
     Else {
         Write-Message "All instances in autoscaling group '$AutoScalingGroup' in region '$Region' appears to be using the current launch config - nothing to do"
@@ -96,7 +97,7 @@ function Get-InstancePrivateDnsName {
 
     )
 
-    $PrivateDnsName = aws --region $Region ec2 describe-instances --instance-ids $InstanceId --filter "Name=private-dns-name,Values=*.*" --query "Reservations[].Instances[].PrivateDnsName" --output text 2>&1
+    $PrivateDnsName = Get-EC2Instance -InstanceId $Id -Region eu-west-1 | Select -Expand Instances | Select -Expand PrivateDnsName
 
     If ($?) {
         Write-Message "Instance '$InstanceId' in region '$Region' has a private DNS name of '$PrivateDnsName'"
@@ -179,23 +180,27 @@ function Set-InstanceHealthStatus {
     )
 
     Write-Message "Setting instance '$Id' in region '$Region' to 'Unhealthy'"
-    aws --region $Region autoscaling set-instance-health --instance-id $Id --health-status $Status
+    Set-ASInstanceHealth -InstanceId $Id -Region $Region -HealthStatus $Status
 
 }
 
 
+# --------------------------------------------------------------------------------
+# Begin script
+# --------------------------------------------------------------------------------
+
 $LaunchConfig = Get-ASGLaunchConfig -AutoScalingGroup $AutoScalingGroup -Region $Region
 
-$RolloverInstanceIds = Get-ASGInstancesOutdatedLaunchConfig -AutoScalingGroup $AutoScalingGroup -LaunchConfig $LaunchConfig -Region $Region
+$RolloverInstances = Get-ASGInstancesOutdatedLaunchConfig -AutoScalingGroup $AutoScalingGroup -LaunchConfig $LaunchConfig -Region $Region
 
-$RolloverInstances = @()
-ForEach ($InstanceId in $RolloverInstanceIds) {
+$RolloverInstanceMap = @()
+ForEach ($InstanceId in ($RolloverInstances.InstanceId)) {
 
     # Attempt to resolve each EC2 instance's private DNS name (which corresponds to Kubernetes node name)
     $NodeName = Get-InstancePrivateDnsName -Id $InstanceId -Region $Region
 
     If ($NodeName) {
-        $RolloverInstances += [PSCustomObject]@{
+        $RolloverInstanceMap += [PSCustomObject]@{
             Id       = $InstanceId
             NodeName = $NodeName
         }
@@ -204,7 +209,7 @@ ForEach ($InstanceId in $RolloverInstanceIds) {
 }
 
 
-ForEach ($Instance in $RolloverInstances) {
+ForEach ($Instance in $RolloverInstanceMap) {
 
     # Get current Kubernets nodes
     $PreviousNodes = Get-KubernetesNodes

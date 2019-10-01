@@ -36,8 +36,29 @@ New-ASLaunchConfiguration -AssociatePublicIpAddress $LaunchConfig.AssociatePubli
 Update-ASAutoScalingGroup -AutoScalingGroupName $AsgName -LaunchConfigurationName $NewLaunchConfigName
 
 
-# Publish lambda
-Publish-AWSPowerShellLambda -ScriptPath .\asg_k8s_rollover_lambda.ps1 -Name "ASGRollOver" -Region eu-west-1
+# Build Lambda package, add dependency
+# https://github.com/kubernetes-client/csharp
+$ScriptPath = 'C:\code\ded-toolbox\eks-upgrade\asg_k8s_rollover_lambda.ps1'
+$ProjectName = Split-Path $ScriptPath -LeafBase
+$StagingDir = 'C:\temp\staging'
+$ProjectDir = Join-Path $StagingDir $ProjectName
+$TempPackagePath = "$($env:TEMP)\$ProjectName.zip"
+$DotNetPackages = @('KubernetesClient')
+
+# Generate the PowerShell core project and package (which we will not use)
+# New-AWSPowerShellLambdaPackage -ScriptPath $ScriptPath -StagingDirectory $StagingDir -OutputPackage $TempPackagePath # fails
+# Remove-Item $TempPackagePath
+Publish-AWSPowerShellLambda -Name $ProjectName -Region eu-west-1 -ScriptPath $ScriptPath -StagingDirectory $StagingDir
+
+# Add .NET packages
+Push-Location $ProjectDir
+ForEach ($Package in $DotNetPackages) {
+    dotnet add package $Package
+}
+Pop-Location
+
+# Publish Lambda
+Publish-AWSPowerShellLambda -Name $ProjectName -Region eu-west-1 -ProjectDirectory $ProjectDir
 
 # Invoke lambda
 $Payload = [PSCustomObject]@{
@@ -46,5 +67,4 @@ $Payload = [PSCustomObject]@{
     Region           = "eu-west-1"
 }
 $PayloadJson = $Payload | ConvertTo-Json
-
-Invoke-LMFunction -FunctionName ASGRollOver -LogType Tail -Payload $PayloadJson | Select -Expand LogResult | b64 -d
+Invoke-LMFunction -FunctionName $ProjectName -LogType Tail -Payload $PayloadJson | Select -Expand LogResult | b64 -d
