@@ -11,17 +11,16 @@ Get-Command -Module AWSPowerShell.NetCore *$Keyword*
 # Get EKS images
 $EksVersion = '1.11'
 $EksAmi = Get-EC2Image -Owner amazon -Filter @{Name = "name"; Values = "*eks-node-$($EksVersion)*" } | Sort CreationDate -Descending
-$EksAmi[0]
+$EksAmi[0] | Select ImageId
 
 
 # Get ASG
 $AsgName = 'eks'
 $Asg = Get-ASAutoScalingGroup -AutoScalingGroupName $AsgName
-Get-ASLaunchConfiguration -LaunchConfigurationName $LaunchConfig
 
 # Get launch config
 $LaunchConfigName = Get-ASAutoScalingGroup -AutoScalingGroupName $AsgName | Select -Expand LaunchConfigurationName
-Get-ASLaunchConfiguration -LaunchConfigurationName $LaunchConfigName
+Get-ASLaunchConfiguration -LaunchConfigurationName $LaunchConfigName | Select ImageId
 
 
 # Update launch config AMI
