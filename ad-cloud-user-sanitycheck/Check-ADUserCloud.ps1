@@ -35,7 +35,7 @@ process {
 
         # Get user objects
         Write-Verbose "Searching for username '$Name'"
-        $Users = @(Get-ADUser -filter "samAccountName -eq '$Name'" -Server "${Dc}:3268" -Properties mail, memberOf)
+        $Users = @(Get-ADUser -filter "samAccountName -eq '$Name'" -Server "${Dc}:3268" -Properties Mail, MemberOf, CanonicalName)
         Write-Verbose "$($Users.Count) user(s) found"
 
         ForEach ($User in $Users) {
@@ -43,43 +43,39 @@ process {
             Write-Host "$($User.DistinguishedName)"
 
             # UPN suffix is @dfds.com
-            Write-Host " - User Principal Name suffix (UPN-suffix) should be 'dfds.com': " -NoNewline -ForegroundColor Gray
+            Write-Host " - User Principal Name suffix (UPN-suffix) should be 'dfds.com':  " -NoNewline -ForegroundColor Gray
             Switch ($User.UserPrincipalName.Split('@')[1]) {
                 'dfds.com' { Write-Host "OK" -ForegroundColor Green -NoNewline; Write-Host " (is '$_')" -ForegroundColor Gray }
                 Default { Write-Host "Problem" -ForegroundColor Red -NoNewline; Write-Host " (is '$_')" -ForegroundColor Gray }
             }
 
             # Mail address is present
-            Write-Host " - Mail address field must be populated: " -NoNewline -ForegroundColor Gray
+            Write-Host " - Mail address field must be populated:                          " -NoNewline -ForegroundColor Gray
             Switch ($User.Mail) {
                 { $_ -match "^\w*@\w*\.\w*" } { Write-Host "OK" -ForegroundColor Green -NoNewline; Write-Host " (is '$_')" -ForegroundColor Gray }
                 Default { Write-Host "Problem" -ForegroundColor Red -NoNewline; Write-Host " (is '$_')" -ForegroundColor Gray }
             }
 
             # Mail address is same as UPN
-            Write-Host " - Email address and UPN should match: " -NoNewline -ForegroundColor Gray
+            Write-Host " - Email address and UPN should match:                            " -NoNewline -ForegroundColor Gray
             Switch ($User.UserPrincipalName -eq $User.Mail) {
                 $true { Write-Host "OK" -ForegroundColor Green -NoNewline; Write-Host " (UPN: $($User.UserPrincipalName), Mail: $($User.Mail))" -ForegroundColor Gray }
                 Default { Write-Host "Warning" -ForegroundColor Yellow -NoNewline; Write-Host " (UPN: $($User.UserPrincipalName), Mail: $($User.Mail))" -ForegroundColor Gray }
             }
 
             # Mail address is same as UPN
-            Write-Host " - Email address and UPN should match: " -NoNewline -ForegroundColor Gray
+            Write-Host " - Email address and UPN should match:                            " -NoNewline -ForegroundColor Gray
             Switch ($User.UserPrincipalName -eq $User.Mail) {
                 $true { Write-Host "OK" -ForegroundColor Green -NoNewline; Write-Host " (UPN: $($User.UserPrincipalName), Mail: $($User.Mail))" -ForegroundColor Gray }
                 Default { Write-Host "Warning" -ForegroundColor Yellow -NoNewline; Write-Host " (UPN: $($User.UserPrincipalName), Mail: $($User.Mail))" -ForegroundColor Gray }
             }
 
-            Write-Host " - Account should probably be in DK domain: " -NoNewline -ForegroundColor Gray
-            Switch ($User.DistinguishedName) {
-                $true { Write-Host "OK" -ForegroundColor Green -NoNewline; Write-Host " (UPN: $($User.UserPrincipalName), Mail: $($User.Mail))" -ForegroundColor Gray }
-                Default { Write-Host "Warning" -ForegroundColor Yellow -NoNewline; Write-Host " (UPN: $($User.UserPrincipalName), Mail: $($User.Mail))" -ForegroundColor Gray }
+            # Account in DK domain
+            Write-Host " - Account should probably be in DK domain:                       " -NoNewline -ForegroundColor Gray
+            Switch ($User.CanonicalName.Split('/')[0]) {
+                'dk.dfds.root' { Write-Host "OK" -ForegroundColor Green -NoNewline; Write-Host " (is '$_')" -ForegroundColor Gray }
+                Default { Write-Host "Warning" -ForegroundColor Yellow -NoNewline; Write-Host " (is '$_')" -ForegroundColor Gray }
             }
-
-
-
-            # Number of groups
-            # DK domain
 
             Write-Host "`r"
 
