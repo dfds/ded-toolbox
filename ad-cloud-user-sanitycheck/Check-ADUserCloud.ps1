@@ -22,6 +22,25 @@ param (
 
 begin {
 
+    function Write-TestDescription ($TestDescription) {
+        $DescriptionLength = 50
+        $WriteString = " - ${TestDescription}: ".PadRight($DescriptionLength)
+        Write-Host $WriteString -NoNewline -ForegroundColor Gray
+    }
+
+    function Write-TestResult ($TestResult, $ActualValue) {
+
+        Switch ($TestResult) {
+            "Problem" { $ResultColor = 'Red'; $ResultString = $_ }
+            "Warning" { $ResultColor = 'Yellow'; $ResultString = $_ }
+            Default { $ResultColor = 'Green'; $ResultString = $_ }
+        }
+
+        Write-Host $ResultString -ForegroundColor $ResultColor -NoNewline
+        Write-Host " (is '$ActualValue')" -ForegroundColor Gray 
+
+    }
+
     # Discover a domain controller
     Write-Host "`r"
     $Dc = Get-ADDomainController -Discover | Select -Expand HostName | Select -First 1
@@ -43,38 +62,31 @@ process {
             Write-Host "$($User.DistinguishedName)"
 
             # UPN suffix is @dfds.com
-            Write-Host " - User Principal Name suffix (UPN-suffix) should be 'dfds.com':  " -NoNewline -ForegroundColor Gray
+            Write-TestDescription "UPN suffix should be 'dfds.com'"
             Switch ($User.UserPrincipalName.Split('@')[1]) {
-                'dfds.com' { Write-Host "OK" -ForegroundColor Green -NoNewline; Write-Host " (is '$_')" -ForegroundColor Gray }
-                Default { Write-Host "Problem" -ForegroundColor Red -NoNewline; Write-Host " (is '$_')" -ForegroundColor Gray }
+                'dfds.com' { Write-TestResult -TestResult OK -ActualValue $_ }
+                Default { Write-TestResult -TestResult Problem -ActualValue $_ }
             }
 
             # Mail address is present
-            Write-Host " - Mail address field must be populated:                          " -NoNewline -ForegroundColor Gray
+            Write-TestDescription "Mail address field must be populated"
             Switch ($User.Mail) {
-                { $_ -match "^\w*@\w*\.\w*" } { Write-Host "OK" -ForegroundColor Green -NoNewline; Write-Host " (is '$_')" -ForegroundColor Gray }
-                Default { Write-Host "Problem" -ForegroundColor Red -NoNewline; Write-Host " (is '$_')" -ForegroundColor Gray }
+                { $_ -match "^\w*@\w*\.\w*" } { Write-TestResult -TestResult OK -ActualValue $_ }
+                Default { Write-TestResult -TestResult Problem -ActualValue $_ }
             }
 
             # Mail address is same as UPN
-            Write-Host " - Email address and UPN should match:                            " -NoNewline -ForegroundColor Gray
+            Write-TestDescription "Email address and UPN should match"
             Switch ($User.UserPrincipalName -eq $User.Mail) {
-                $true { Write-Host "OK" -ForegroundColor Green -NoNewline; Write-Host " (UPN: $($User.UserPrincipalName), Mail: $($User.Mail))" -ForegroundColor Gray }
-                Default { Write-Host "Warning" -ForegroundColor Yellow -NoNewline; Write-Host " (UPN: $($User.UserPrincipalName), Mail: $($User.Mail))" -ForegroundColor Gray }
-            }
-
-            # Mail address is same as UPN
-            Write-Host " - Email address and UPN should match:                            " -NoNewline -ForegroundColor Gray
-            Switch ($User.UserPrincipalName -eq $User.Mail) {
-                $true { Write-Host "OK" -ForegroundColor Green -NoNewline; Write-Host " (UPN: $($User.UserPrincipalName), Mail: $($User.Mail))" -ForegroundColor Gray }
-                Default { Write-Host "Warning" -ForegroundColor Yellow -NoNewline; Write-Host " (UPN: $($User.UserPrincipalName), Mail: $($User.Mail))" -ForegroundColor Gray }
+                $true { Write-TestResult -TestResult OK -ActualValue $_ }
+                Default { Write-TestResult -TestResult Warning -ActualValue $_ }
             }
 
             # Account in DK domain
-            Write-Host " - Account should probably be in DK domain:                       " -NoNewline -ForegroundColor Gray
+            Write-TestDescription "Account should probably be in DK domain"
             Switch ($User.CanonicalName.Split('/')[0]) {
-                'dk.dfds.root' { Write-Host "OK" -ForegroundColor Green -NoNewline; Write-Host " (is '$_')" -ForegroundColor Gray }
-                Default { Write-Host "Warning" -ForegroundColor Yellow -NoNewline; Write-Host " (is '$_')" -ForegroundColor Gray }
+                'dk.dfds.root' { Write-TestResult -TestResult OK -ActualValue $_ }
+                Default { Write-TestResult -TestResult Warning -ActualValue $_ }
             }
 
             Write-Host "`r"
