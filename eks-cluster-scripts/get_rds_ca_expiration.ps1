@@ -27,5 +27,5 @@ foreach ($Account in $Accounts) {
     $instances | Add-Member -Name "Region" -Value $Region -MemberType NoteProperty
     $accountInstances.Add($instances) | Out-Null
   }
-  $accountInstances
+  $accountInstances | Format-Table
 }
