@@ -1,2 +1,8 @@
 update-federation-metadata/temp.txt
 update-federation-metadata/FederationMetadata.xml
+
+# Build results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
