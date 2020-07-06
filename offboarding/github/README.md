@@ -10,7 +10,12 @@ With Rust installed, run `cargo run` within this directory to build and run the 
 
 The tool will be expecting a GITHUB_TOKEN environment variable, e.g.
 
-macOS/Unix: `GITHUB_TOKEN=1234 cargo run`
+macOS/Unix: 
+```
+GITHUB_TOKEN=1234 cargo run
+```
+
+
 Windows (Powershell): 
 ```
 $env:GITHUB_TOKEN=1234
