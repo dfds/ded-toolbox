@@ -42,7 +42,7 @@ kubectl --namespace $Namespace create rolebinding $ServiceAccountName --role=$Ku
 # Extract token and generate kubeconfig
 $KubeSecretName = $((kubectl --namespace $ServiceAccountNamespace get secret -o name | Select-String $ServiceAccountName) -replace 'secret/', '')
 $KubeToken = $(kubectl --namespace $ServiceAccountNamespace get secret $KubeSecretName -o=jsonpath="{.data.token}" | base64 -decode)
-$KubeConfigTemplate = Get-Content (Join-Path $ScriptRoot 'config.template')
+$KubeConfigTemplate = Get-Content (Join-Path $ScriptRoot 'config.template') -Raw
 $KubeConfig = $KubeConfigTemplate -replace 'NAMESPACE_REPLACE', $Namespace -replace 'KUBE_TOKEN', $KubeToken
 
 # Assume role
@@ -55,4 +55,5 @@ Catch {Throw "Failed to assume role: ($_.Message)"}
 Set-AWSCredential -AccessKey $Creds.AccessKeyId -SecretKey $Creds.SecretAccessKey -SessionToken $Creds.SessionToken
 
 # Push to AWS parameter store
-Write-SSMParameter -Name $AwsParameterName -Value $KubeConfig.ToString() -Type SecureString -Overwrite:$true -Select '^Name'
+Write-SSMParameter -Name $AwsParameterName -Value $KubeConfig -Type SecureString -Overwrite:$true | Out-Null
+Get-SSMParameter -Name $AwsParameterName | Select Name, LastModifiedDate, Value
