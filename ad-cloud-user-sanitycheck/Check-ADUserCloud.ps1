@@ -71,7 +71,7 @@ process {
             # Mail address is present
             Write-TestDescription "Mail address field must be populated"
             Switch ($User.Mail) {
-                { $_ -match "^\w*@\w*\.\w*" } { Write-TestResult -TestResult OK -ActualValue $_ }
+                { $_ -match "^.*@\w*\.\w*" } { Write-TestResult -TestResult OK -ActualValue $_ }
                 Default { Write-TestResult -TestResult Problem -ActualValue $_ }
             }
 
