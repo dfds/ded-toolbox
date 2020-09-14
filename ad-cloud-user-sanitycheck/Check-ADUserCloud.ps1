@@ -100,7 +100,7 @@ process {
 end {
     
     Write-Host "See " -NoNewline -ForegroundColor White
-    Write-Host "https://wiki.build.dfds.com/infrastructure/user-accounts" -NoNewline -ForegroundColor Cyan
+    Write-Host "https://wiki.dfds.cloud/documentation/support/user-accounts" -NoNewline -ForegroundColor Cyan
     Write-Host " for more info.`n"
     
 }
