@@ -38,7 +38,6 @@ saml2aws login --role=$SamlRole --force
 
 # Generate kube toke and config for service account
 $ENV:AWS_PROFILE = $AwsProfile
-
 kubectl --namespace $ServiceAccountNamespace create serviceaccount $ServiceAccountName
 kubectl --namespace $Namespace create rolebinding $ServiceAccountName --role=$Kuberole --serviceaccount=${ServiceAccountNamespace}:${ServiceAccountName}
 
