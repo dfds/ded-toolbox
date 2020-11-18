@@ -10,7 +10,8 @@ Each time the script is run it will:
 
 1. Clone the **current** version of the Hellman manifests
 2. Override any (supported) variables specified `sandbox-vars-$CLUSTERNAME.sh`
-3. Sets `eks_is_sandbox = true`
+3. Apply sane sandbox defaults for selected variables, unless they have been explicitly defined
+4. Sets `eks_is_sandbox = true`
 
 In other words: You can re-run the script as many times as you like, keeping your sandbox manifests aligned with production, apart from your overrides. You could even make it a habbit of running the script before running `terragrunt apply-all` on your cluster.
 

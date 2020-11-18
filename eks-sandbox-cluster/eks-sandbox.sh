@@ -139,35 +139,35 @@ fi
 if [[ -n $SLACK_WEBHOOK_URL ]]; then
     sed -i "s|\(slack_webhook_url\s*=\s*\).*|\1${SLACK_WEBHOOK_URL}|" "${SANDBOX_SERVICES_MANIFEST}"
 else
-    sed -i "s|\(slack_webhook_url\s*=\s*\).*|# \1 \"\"|" "${SANDBOX_SERVICES_MANIFEST}"
+    sed -i "s|\(slack_webhook_url\s*=\s*\).*|# \1\"\"|" "${SANDBOX_SERVICES_MANIFEST}"
 fi
 
 # If not explicitly defined in vars, default Prometheus storage to 20Gi
 if [[ -n $MONITORING_KUBE_PROMETHEUS_STACK_PROMETHEUS_STORAGE_SIZE ]]; then
-    sed -i "s|\(monitoring_kube_prometheus_stack_prometheus_storage_size\s*=\s*\)\".*\"|\"\1${MONITORING_KUBE_PROMETHEUS_STACK_PROMETHEUS_STORAGE_SIZE}\"|" "${SANDBOX_SERVICES_MANIFEST}"
+    sed -i "s|\(monitoring_kube_prometheus_stack_prometheus_storage_size\s*=\s*\)\".*\"|\1\"${MONITORING_KUBE_PROMETHEUS_STACK_PROMETHEUS_STORAGE_SIZE}\"|" "${SANDBOX_SERVICES_MANIFEST}"
 else
-    sed -i "s|\(monitoring_kube_prometheus_stack_prometheus_storage_size\s*=\s*\)\".*\"|\"\1200Gi\"|" "${SANDBOX_SERVICES_MANIFEST}"
+    sed -i "s|\(monitoring_kube_prometheus_stack_prometheus_storage_size\s*=\s*\)\".*\"|\1\"20Gi\"|" "${SANDBOX_SERVICES_MANIFEST}"
 fi
 
 # If not explicitly defined in vars, default Prometheus retention to 7d
 if [[ -n $MONITORING_KUBE_PROMETHEUS_STACK_PROMETHEUS_RETENTION ]]; then
     sed -i "s|\(monitoring_kube_prometheus_stack_prometheus_retention\s*=\s*\)\".*\"|\"\1${MONITORING_KUBE_PROMETHEUS_STACK_PROMETHEUS_RETENTION}\"|" "${SANDBOX_SERVICES_MANIFEST}"
 else
-    sed -i "s|\(monitoring_kube_prometheus_stack_prometheus_retention\s*=\s*\)\".*\"|\1 \"7d\"|" "${SANDBOX_SERVICES_MANIFEST}"
+    sed -i "s|\(monitoring_kube_prometheus_stack_prometheus_retention\s*=\s*\)\".*\"|\1\"7d\"|" "${SANDBOX_SERVICES_MANIFEST}"
 fi
 
 # Clear Slack webhook if not explicitly set
 if [[ -n $MONITORING_KUBE_PROMETHEUS_STACK_SLACK_WEBHOOK ]]; then
     sed -i "s|\(monitoring_kube_prometheus_stack_slack_webhook\s*=\s*\).*|\1${MONITORING_KUBE_PROMETHEUS_STACK_SLACK_WEBHOOK}|" "${SANDBOX_SERVICES_MANIFEST}"
 else
-    sed -i "s|\(monitoring_kube_prometheus_stack_slack_webhook\s*=\s*\).*|# \1 \"\"|" "${SANDBOX_SERVICES_MANIFEST}"
+    sed -i "s|\(monitoring_kube_prometheus_stack_slack_webhook\s*=\s*\).*|# \1\"\"|" "${SANDBOX_SERVICES_MANIFEST}"
 fi
 
 # Clear Slack webhook if not explicitly set
 if [[ -n $MONITORING_KUBE_PROMETHEUS_STACK_SLACK_CHANNEL ]]; then
     sed -i "s|\(monitoring_kube_prometheus_stack_slack_channel\s*=\s*\).*|\1${MONITORING_KUBE_PROMETHEUS_STACK_SLACK_CHANNEL}|" "${SANDBOX_SERVICES_MANIFEST}"
 else
-    sed -i "s|\(monitoring_kube_prometheus_stack_slack_channel\s*=\s*\).*|# \1 \"\"|" "${SANDBOX_SERVICES_MANIFEST}"
+    sed -i "s|\(monitoring_kube_prometheus_stack_slack_channel\s*=\s*\).*|# \1\"\"|" "${SANDBOX_SERVICES_MANIFEST}"
 fi
 
 # Clear Slack webhook if not explicitly set
