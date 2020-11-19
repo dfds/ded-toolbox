@@ -63,6 +63,8 @@ sed -i "s|\(traefik_alb_auth_core_alias\s*=.*\)|# \1|" "${SANDBOX_SERVICES_MANIF
 # Simple token replacements
 # --------------------------------------------------
 
+[[ -n $MODULES_RELEASE_NAME ]] && sed -i "s|\(\?ref=\)[0-9]*\.[0-9]*\.[0-9]*|\1${$MODULES_RELEASE_NAME}|" "${SANDBOX_CLUSTER_MANIFEST}"
+
 [[ -n $EKS_CLUSTER_VERSION ]] && sed -i "s|\(eks_cluster_version\s*=\s*\)\".*\"|\1\"${EKS_CLUSTER_VERSION}\"|" "${SANDBOX_CLUSTER_MANIFEST}"
 
 [[ -n $EKS_WORKER_SSH_IP_WHITELIST ]] && sed -i "s|\(eks_worker_ssh_ip_whitelist\s*=\s*\)\\[.*\]|\1${EKS_WORKER_SSH_IP_WHITELIST}|" "${SANDBOX_CLUSTER_MANIFEST}"
@@ -113,12 +115,13 @@ fi
 # Simple token replacements
 # --------------------------------------------------
 
+[[ -n $MODULES_RELEASE_NAME ]] && sed -i "s|\(\?ref=\)[0-9]*\.[0-9]*\.[0-9]*|\1${$MODULES_RELEASE_NAME}|" "${SANDBOX_SERVICES_MANIFEST}"
+
 [[ -n $ALARM_NOTIFIER_DEPLOY ]] && sed -i "s|\(alarm_notifier_deploy\s*=\s*\).*|\1${ALARM_NOTIFIER_DEPLOY}|" "${SANDBOX_SERVICES_MANIFEST}"
 
 [[ -n $CLOUDWATCH_ALARM_ALB_TARGETS_HEALTH_DEPLOY ]] && sed -i "s|\(cloudwatch_alarm_alb_targets_health_deploy\s*=\s*\).*|\1${CLOUDWATCH_ALARM_ALB_TARGETS_HEALTH_DEPLOY}|" "${SANDBOX_SERVICES_MANIFEST}"
 
 [[ -n $MONITORING_KUBE_PROMETHEUS_STACK_DEPLOY ]] && sed -i "s|\(monitoring_kube_prometheus_stack_deploy\s*=\s*\).*|\1${MONITORING_KUBE_PROMETHEUS_STACK_DEPLOY}|" "${SANDBOX_SERVICES_MANIFEST}"
-
 
 
 # --------------------------------------------------
