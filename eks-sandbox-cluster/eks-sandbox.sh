@@ -109,6 +109,20 @@ else
     sed -i "s|\(eks_nodegroup1_desired_size_per_subnet\s*=\s*\).*|\11|" "${SANDBOX_CLUSTER_MANIFEST}"
 fi
 
+# # If not explicitly define in vars, default instance size to t3.medium
+# if [[ -n $EKS_NODEGROUP2_INSTANCE_TYPES ]]; then
+#     sed -i "s|\(eks_nodegroup2_instance_types\s*=\s*\)\[.*\]|\1${EKS_NODEGROUP2_INSTANCE_TYPES}|" "${SANDBOX_CLUSTER_MANIFEST}"
+# else
+#     sed -i "s|\(eks_nodegroup2_instance_types\s*=\s*\)\[.*\]|\1\[\"t3.medium\"\]|" "${SANDBOX_CLUSTER_MANIFEST}"
+# fi
+
+# If not explicitly defined in vars, default ASG size to 1
+if [[ -n $EKS_NODEGROUP2_DESIRED_SIZE_PER_SUBNET ]]; then
+    sed -i "s|\(eks_nodegroup2_desired_size_per_subnet\s*=\s*\).*|\1${EKS_NODEGROUP2_DESIRED_SIZE_PER_SUBNET}|" "${SANDBOX_CLUSTER_MANIFEST}"
+else
+    sed -i "s|\(eks_nodegroup2_desired_size_per_subnet\s*=\s*\).*|\11|" "${SANDBOX_CLUSTER_MANIFEST}"
+fi
+
 
 # --------------------------------------------------
 # Services
