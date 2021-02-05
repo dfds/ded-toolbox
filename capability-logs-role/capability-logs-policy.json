@@ -1,0 +1,53 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "CapabilityLogGroups",
+            "Effect": "Allow",
+            "Action": [
+                "logs:DeleteSubscriptionFilter",
+                "logs:DescribeLogStreams",
+                "logs:DescribeMetricFilters",
+                "logs:DescribeSubscriptionFilters",
+                "logs:FilterLogEvents",
+                "logs:GetLogEvents",
+                "logs:GetLogGroupFields",
+                "logs:ListTagsLogGroup",
+                "logs:PutSubscriptionFilter",
+                "logs:StartQuery"
+            ],
+            "Resource": [
+                "arn:aws:logs:*:ACCOUNT_ID:log-group:/k8s/*/CAPABILITY_ROOT_ID",
+                "arn:aws:logs:*:ACCOUNT_ID:log-group:/k8s/*/CAPABILITY_ROOT_ID:log-stream:"
+            ]
+        },
+        {
+            "Sid": "CapabilityLogStreams",
+            "Effect": "Allow",
+            "Action": [
+                "logs:GetLogEvents"
+            ],
+            "Resource": [
+                "arn:aws:logs:*:ACCOUNT_ID:log-group:/k8s/*/CAPABILITY_ROOT_ID:log-stream:*"
+            ]
+        },
+        {
+            "Sid": "Asterisk",
+            "Effect": "Allow",
+            "Action": [
+                "logs:DescribeDestinations",
+                "logs:DescribeExportTasks",
+                "logs:DescribeLogGroups",
+                "logs:DescribeQueries",
+                "logs:DescribeResourcePolicies",
+                "logs:GetLogDelivery",
+                "logs:GetLogRecord",
+                "logs:GetQueryResults",
+                "logs:ListLogDeliveries",
+                "logs:StopQuery",
+                "logs:TestMetricFilter"
+            ],
+            "Resource": "*"
+        }
+    ]
+}
