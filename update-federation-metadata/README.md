@@ -15,3 +15,7 @@ bash run.sh
 ```
 
 It will fail on some legacy accounts, it self and some others.
+
+
+# If certificate is already expired
+Root login with master account in AWS management console and update the federation metadata. Then login with saml2aws and run the script.
