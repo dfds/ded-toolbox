@@ -1,4 +1,7 @@
-#Requires -Modules @{ ModuleName = 'AWSPowerShell.NetCore'; ModuleVersion = '4.0.0' }
+#Requires -Modules @{ ModuleName = 'AWS.Tools.Common'; ModuleVersion = '4.0.0' }
+#Requires -Modules @{ ModuleName = 'AWS.Tools.SecurityToken'; ModuleVersion = '4.0.0' }
+#Requires -Modules @{ ModuleName = 'AWS.Tools.SimpleSystemsManagement'; ModuleVersion = '4.0.0' }
+
 [CmdletBinding()]
 
 param (
