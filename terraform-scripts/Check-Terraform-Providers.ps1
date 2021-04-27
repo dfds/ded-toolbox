@@ -174,6 +174,9 @@ foreach($usedProvider in $usedProviders)
     # get the available provider
     $availableProvider = ($providerList | Where-Object { $_.ProviderName -eq $usedProvider.ProviderName } )
 
+    # add the latest version to the usedProvider
+    Add-Member -InputObject $usedProvider -MemberType NoteProperty -Name LatestVersion -Value $availableProvider.LatestProviderVersion        
+
     if ($usedProvider.ProviderVersion -match '^>=' -or $usedProvider.ProviderVersion -eq "Latest") { Add-Member -InputObject $usedProvider -MemberType NoteProperty -Name Comment -Value "Latest version will be used" }
     if ($usedProvider.ProviderVersion -match '^~>')
     {
@@ -202,5 +205,11 @@ Write-Host "Versions Comparison Complete" -ForegroundColor Cyan
 Write-Host ""
 Write-Host ""
 
-# display the used providers
-$usedProviders | ft -AutoSize
+# display the provider information in a formatted table
+$usedProviders | `
+    Select-Object -Property @{Label="File Path";Expression={($_.FilePath)}},            `
+        @{Label="Provider Name";Expression={($_.ProviderName)}}, `
+        @{Label="Used Version";Expression={($_.ProviderVersion)}}, `
+        @{Label="Latest Version";Expression={($_.LatestVersion)}}, `
+        @{Label="Status";Expression={($_.Comment)}} | `
+        ft -AutoSize
