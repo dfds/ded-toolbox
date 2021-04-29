@@ -18,14 +18,24 @@ Param(
     [string]$Path=(Get-Location)
 )
 
+#Write-Progress
+#Write-Verbose
+#Write-Debug
+
+#[CmdletBinding()]
+#$VerbosePreference  = "Continue"
+#$DebugPreference
+
+# [PSCustomObject]@{"key1" = "val1";"key2" = "val2"}
+
 Function GetTerraformFiles{
 Param([string]$Path,[System.Collections.ArrayList]$FileCollection)
 
     # get all child items for the specified path
-    $directoryItems = Get-ChildItem -Path $Path -Include *.tf -Recurse -Force
+    $directoryItems = Get-ChildItem -Path $Path -Include *.tf -Recurse -Force  
 
     # remove any found in the terragrunt-cache
-    $directoryItems = ($directoryItems | Where-Object { $_.FullName -notlike '*\.terragrunt-cache\*' })
+    $directoryItems = ($directoryItems | Where-Object { $_.FullName -notlike '*\.*\*' })
     
     # return the found items
     return $directoryItems
@@ -35,9 +45,13 @@ Param([string]$Path,[System.Collections.ArrayList]$FileCollection)
 # clear display
 Clear-Host
 
+# get the directory seperator character to use
+$dSep = [System.IO.Path]::DirectorySeparatorChar
+
 # validate the path specified exists
 if (!(Test-Path $Path))
 {
+    # Use a throw statement here....
     Write-Host "The path specified does not exist.  The script will now terminate." -ForegroundColor Red
     exit
 }
