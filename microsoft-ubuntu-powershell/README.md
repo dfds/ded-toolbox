@@ -1,19 +1,25 @@
-# Microsoft Graph Register Extension Schema 
+# Microsoft Ubuntu Powershell container
 
-Used to interact with Microsoft Graph using Powershell
+Used to interact with powershell clis on multiple OS hosts.
+
+Current CLI support:
+
+- MSGraph
+- Azure.Standard.Preview
 
 ## Usage
 
-
-### Build & Run container workload
-
-```
-docker build -t ubuntu-powershell-msgraph-cli .
-docker run --name ubuntu-powershell-host -it -v \msgraph ubuntu-powershell-msgraph-cli
-```
-
-### Execute script in container shell
+### Build & Run container
 
 ```
-.\register_extension_schema.ps1 66def2fd-0451-4719-8d00-4a925c746ee2
+docker build -t microsoft-ubuntu-powershell .
+docker run --name ubuntu-powershell-host -it -v \msgraph microsoft-ubuntu-powershell
+```
+
+### PS Scripts
+
+```
+./scripts/register_extension_schema.ps1 -AzureADApplicationId 66def2fd-0451-4719-8d00-4a925c746ee2
+
+./scripts/register_directory_extension_property.ps1 -AzureADApplicationId 66def2fd-0451-4719-8d00-4a925c746ee2 -ExtensionName "CustomExtension" -ExtensionDataType "string"
 ```
