@@ -22,8 +22,8 @@ NOTE: Remove container via docker rm microsoft-ubuntu-powershell-host -f
 
 ```
 #MSGraph
-./scripts/register_extension_schema.ps1 -AzureADApplicationId 66def2fd-0451-4719-8d00-4a925c746ee2  -ExtensionName "CustomExtension" -ExtensionDataType "string"
+./scripts/register_extension_schema.ps1 -AzureADApplicationId 00000000-0000-0000-0000-000000000000  -ExtensionName "CustomExtension" -ExtensionDataType "string"
 
 #AzureAD
-./scripts/register_directory_extension_property.ps1 -AzureADApplicationId 66def2fd-0451-4719-8d00-4a925c746ee2 -ExtensionName "CustomExtension" -ExtensionDataType "string"
+./scripts/register_directory_extension_property.ps1 -AzureADApplicationId 00000000-0000-0000-0000-000000000000 -ExtensionName "CustomExtension" -ExtensionDataType "string"
 ```
