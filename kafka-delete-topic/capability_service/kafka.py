@@ -1,4 +1,5 @@
 import logging
+import subprocess
 
 import requests
 from confluent_kafka.admin import AdminClient
@@ -74,6 +75,19 @@ class Topic:
         else:
             raise InvalidKafkaCluster(environment_name)
 
+    def _get_confluent_environment_id(self, environment_name: str) -> str:
+        """
+        :param environment_name: A valid Confluence Kafka environment name. Currently only dev and prod clusters exist.
+        :type environment_name: str
+        :return: str
+        """
+        if environment_name.upper() in ['PROD', 'PRODUCTION']:
+            return self.confluent_env_id_prod
+        elif environment_name.upper() in ['DEV', 'DEVELOP', 'DEVELOPMENT']:
+            return self.confluent_env_id_dev
+        else:
+            raise InvalidKafkaCluster(environment_name)
+
     def _get_confluent_cluster_id(self, environment_name: str) -> str:
         """
         :param environment_name: A valid Confluence Kafka environment name. Currently only dev and prod clusters exist.
@@ -92,7 +106,7 @@ class Topic:
         :param topics: A dictionary of topics and uuids (from the capability service)
         :type topics: dict
         """
-        # self._delete_blaster_topics(topics)
+        self._delete_blaster_topics(topics)
         self._delete_confluent_topics(topics)
 
     def _delete_blaster_topics(self, topics: dict) -> None:
@@ -112,13 +126,19 @@ class Topic:
             else:
                 logging.error(f'The capability service returned status code {response.status_code}')
 
-    @staticmethod
-    def _delete_confluent_topics(topics: dict) -> None:
+    def _delete_confluent_topics(this, topics: dict) -> None:
         """Delete topics from Confluent cloud using the ccloud tool.
         :param topics: A dictionary of topics and uuids (from the capability service)
         :type topics: dict
         """
-        logging.warning('Deleting topics from Confluent Cloud is not yet implemented.')
+        subprocess.run(['ccloud', 'login'])
+        for topic_name, environment_name in topics.items():
+            env_id: str = this._get_confluent_environment_id(environment_name)
+            cluster_id: str = this._get_confluent_cluster_id(environment_name)
+            delete_topic_cmd: list = ['ccloud', 'kafka', 'topic', 'delete',
+                                      topic_name, '--environment', env_id, '--cluster', cluster_id]
+            logging.info(f'{" ".join(delete_topic_cmd)}')
+            subprocess.run(delete_topic_cmd)
 
     @staticmethod
     def _delete_confluent_topics_using_broker(topics: dict, config: dict) -> None:
@@ -126,7 +146,6 @@ class Topic:
         :param topics: A dictionary of topics and uuids (from the capability service)
         :type topics: dict
         """
-        logging.warning('Deleting topics from Confluent Cloud is not yet implemented.')
         admin_client: AdminClient = AdminClient(config)
         futures: dict = admin_client.delete_topics(list(topics.keys()), operation_timeout=30)
 

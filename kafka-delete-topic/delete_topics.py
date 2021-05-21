@@ -27,12 +27,12 @@ def main():
                          confluent_env_id_prod=confluent_env_id_prod,
                          confluent_env_id_dev=confluent_env_id_dev,
                          confluent_cluster_id_prod=confluent_cluster_id_prod,
-                         confluent_cluster_id_dev=confluent_cluster_id_dev,
-                         level=logging.DEBUG)
+                         confluent_cluster_id_dev=confluent_cluster_id_dev)
 
     # This is where you need to add the topics you want to delete.
     topics_data: dict = {'pub.sandbox-aunes-kkpbj.foo': 'dev',
-                         'pub.sandbox-aunes-kkpbj.bar': 'dev'}
+                         'pub.sandbox-aunes-kkpbj.bar': 'dev',
+                         'pub.sandbox-aunes-kkpbj.lala': 'prod'}
 
     topic.delete_topics(topics_data)
 
