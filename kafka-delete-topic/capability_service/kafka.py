@@ -1,8 +1,6 @@
 import logging
-import os
 
 import requests
-from dotenv import load_dotenv
 from confluent_kafka.admin import AdminClient
 from requests import Response
 
