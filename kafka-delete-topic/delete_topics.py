@@ -15,8 +15,8 @@ def main():
     blaster_cluster_uuid_prod: str = os.environ.get('BLASTER_CLUSTER_UUID_PROD')
     blaster_cluster_uuid_dev: str = os.environ.get('BLASTER_CLUSTER_UUID_DEV')
 
-    confluent_api_token_prod: str = os.environ.get('CONFLUENT_API_TOKEN_PROD')
-    confluent_api_token_dev: str = os.environ.get('CONFLUENT_API_TOKEN_DEV')
+    confluent_env_id_prod: str = os.environ.get('CONFLUENT_ENV_ID_PROD')
+    confluent_env_id_dev: str = os.environ.get('CONFLUENT_ENV_ID_DEV')
     confluent_cluster_id_prod: str = os.environ.get('CONFLUENT_CLUSTER_ID_PROD')
     confluent_cluster_id_dev: str = os.environ.get('CONFLUENT_CLUSTER_ID_DEV')
 
@@ -24,8 +24,8 @@ def main():
                          blaster_topics_api_url=blaster_topics_api_url,
                          blaster_cluster_uuid_prod=blaster_cluster_uuid_prod,
                          blaster_cluster_uuid_dev=blaster_cluster_uuid_dev,
-                         confluent_api_token_prod=confluent_api_token_prod,
-                         confluent_api_token_dev=confluent_api_token_dev,
+                         confluent_env_id_prod=confluent_env_id_prod,
+                         confluent_env_id_dev=confluent_env_id_dev,
                          confluent_cluster_id_prod=confluent_cluster_id_prod,
                          confluent_cluster_id_dev=confluent_cluster_id_dev,
                          level=logging.DEBUG)

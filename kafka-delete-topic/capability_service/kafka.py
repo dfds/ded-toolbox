@@ -27,8 +27,8 @@ class Topic:
                  blaster_topics_api_url: str,
                  blaster_cluster_uuid_prod: str,
                  blaster_cluster_uuid_dev: str,
-                 confluent_api_token_prod: str,
-                 confluent_api_token_dev: str,
+                 confluent_env_id_prod: str,
+                 confluent_env_id_dev: str,
                  confluent_cluster_id_prod: str,
                  confluent_cluster_id_dev: str,
                  level: int = logging.INFO) -> None:
@@ -37,8 +37,8 @@ class Topic:
         :param blaster_topics_api_url: The full URL to the Topic API, for instance https://<hostname>/capability/api/v1/topics # noqa 501
         :param blaster_cluster_uuid_prod: The UUID for the Kafka production cluster.
         :param blaster_cluster_uuid_dev: The UUID for the Kafka development cluster.
-        :param confluent_api_token_prod: A Confluent Kafka API token for the production cluster.
-        :param confluent_api_token_dev: A Confluent Kafka API token for the development cluster.
+        :param confluent_env_id_prod: A Confluent Kafka environment id for production.
+        :param confluent_env_id_dev: A Confluent Kafka environment id for development.
         :param confluent_cluster_id_prod: The ID for the Confluent Kafka production cluster.
         :param confluent_cluster_id_dev: The ID for the Confluent Kafka development cluster.
         :param level: A valid log level from the logging module. Default: logging.INFO
@@ -46,8 +46,8 @@ class Topic:
         :type blaster_topics_api_url: str
         :type blaster_cluster_uuid_prod: str
         :type blaster_cluster_uuid_dev: str
-        :type confluent_api_token_prod: str
-        :type confluent_api_token_dev: str
+        :type confluent_env_id_prod: str
+        :type confluent_env_id_dev: str
         :type confluent_cluster_id_prod: str
         :type confluent_cluster_id_dev: str
         :type level: int
@@ -57,8 +57,8 @@ class Topic:
         self.blaster_topics_api_url: str = blaster_topics_api_url
         self.blaster_cluster_uuid_prod: str = blaster_cluster_uuid_prod
         self.blaster_cluster_uuid_dev: str = blaster_cluster_uuid_dev
-        self.confluent_api_token_prod = confluent_api_token_prod
-        self.confluent_api_token_dev = confluent_api_token_dev
+        self.confluent_env_id_prod = confluent_env_id_prod
+        self.confluent_env_id_dev = confluent_env_id_dev
         self.confluent_cluster_id_prod = confluent_cluster_id_prod
         self.confluent_cluster_id_dev = confluent_cluster_id_dev
         self.log_level: int = level
@@ -123,15 +123,13 @@ class Topic:
         logging.warning('Deleting topics from Confluent Cloud is not yet implemented.')
 
     @staticmethod
-    def _delete_confluent_topics_using_broker(topics: dict, broker: str) -> None:
+    def _delete_confluent_topics_using_broker(topics: dict, config: dict) -> None:
         """Delete topics from Confluent cloud using the confluent Python API.
         :param topics: A dictionary of topics and uuids (from the capability service)
         :type topics: dict
-
-        TODO: Not currently used, because I need to figure out what to pass in as the value for broker.
         """
         logging.warning('Deleting topics from Confluent Cloud is not yet implemented.')
-        admin_client: AdminClient = AdminClient({'bootstrap.servers': broker})
+        admin_client: AdminClient = AdminClient(config)
         futures: dict = admin_client.delete_topics(list(topics.keys()), operation_timeout=30)
 
         for topic_name, future in futures.items():
@@ -140,31 +138,3 @@ class Topic:
                 logging.info(f'Topic {topic_name} deleted')
             except Exception as e:
                 logging.error(f'Failed to delete topic {topic_name}: {e}')
-
-
-if __name__ == "__main__":
-    load_dotenv()
-
-    blaster_bearer_token: str = os.environ.get('BLASTER_BEARER_TOKEN')
-    blaster_topics_api_url: str = os.environ.get('BLASTER_TOPICS_API_URL')
-    blaster_cluster_uuid_prod: str = os.environ.get('BLASTER_CLUSTER_UUID_PROD')
-    blaster_cluster_uuid_dev: str = os.environ.get('BLASTER_CLUSTER_UUID_DEV')
-
-    confluent_api_token_prod: str = os.environ.get('CONFLUENT_API_TOKEN_PROD')
-    confluent_api_token_dev: str = os.environ.get('CONFLUENT_API_TOKEN_DEV')
-    confluent_cluster_id_prod: str = os.environ.get('CONFLUENT_CLUSTER_ID_PROD')
-    confluent_cluster_id_dev: str = os.environ.get('CONFLUENT_CLUSTER_ID_DEV')
-
-    topic: Topic = Topic(blaster_bearer_token=blaster_bearer_token,
-                         blaster_topics_api_url=blaster_topics_api_url,
-                         blaster_cluster_uuid_prod=blaster_cluster_uuid_prod,
-                         blaster_cluster_uuid_dev=blaster_cluster_uuid_dev,
-                         confluent_api_token_prod=confluent_api_token_prod,
-                         confluent_api_token_dev=confluent_api_token_dev,
-                         confluent_cluster_id_prod=confluent_cluster_id_prod,
-                         confluent_cluster_id_dev=confluent_cluster_id_dev,
-                         level=logging.DEBUG)
-    topics_data: dict = {'pub.sandbox-aunes-kkpbj.foo': 'dev',
-                         'pub.sandbox-aunes-kkpbj.bar': 'dev'}
-
-    topic.delete_topics(topics_data)
