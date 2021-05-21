@@ -131,6 +131,7 @@ class Topic:
         :param topics: A dictionary of topics and uuids (from the capability service)
         :type topics: dict
         """
+        logging.info('Delete topics on Confluent Cloud.')
         subprocess.run(['ccloud', 'login'])
         for topic_name, environment_name in topics.items():
             env_id: str = this._get_confluent_environment_id(environment_name)

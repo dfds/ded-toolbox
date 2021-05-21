@@ -32,7 +32,7 @@ def main():
     # This is where you need to add the topics you want to delete.
     topics_data: dict = {'pub.sandbox-aunes-kkpbj.foo': 'dev',
                          'pub.sandbox-aunes-kkpbj.bar': 'dev',
-                         'pub.sandbox-aunes-kkpbj.lala': 'prod'}
+                         'sandbox-aunes-kkpbj.lala': 'prod'}
 
     topic.delete_topics(topics_data)
 
