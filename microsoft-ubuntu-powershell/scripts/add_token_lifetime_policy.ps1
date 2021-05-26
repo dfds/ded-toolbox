@@ -1,4 +1,4 @@
-﻿#equires -Modules AzureAD.Standard.Preview
+﻿#Requires -Modules AzureAD.Standard.Preview
 
 param (
     [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true)] 
