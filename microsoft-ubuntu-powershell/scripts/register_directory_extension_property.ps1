@@ -63,7 +63,7 @@ if($AppExtensionProperty.ExtensionId -eq $null){
     }
 
     # Fetch service principal of app registration
-    $SecurityPrincipal = (Get-AzureADServicePrincipal -Filter "Id eq '$AzureADApplicationId'") 
+    $SecurityPrincipal = (Get-AzureADServicePrincipal -Filter "AppId eq '$AzureADApplicationId'") 
     
     # Convert hashtable to json
     $PolicyDefinition = $ClaimsMappingPolicy | ConvertTo-Json -Depth 99 -Compress
