@@ -1,4 +1,4 @@
-﻿#Requires -Modules AzureAD.Standard.Preview
+﻿#equires -Modules AzureAD.Standard.Preview
 
 param (
     [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true)] 
@@ -11,8 +11,11 @@ param (
 # Connect to AzureAD 
 Connect-AzureAD
 
+# Create json payload for policy
+$jsonPayload = "{'TokenLifetimePolicy':{'Version':1,'AccessTokenLifetime':'$AccessTokenLifetime'}}"
+
 # Create new TokenLifeTimePolicy
-$policy = New-AzureADPolicy -Definition @('{"TokenLifetimePolicy":{"Version":1,"AccessTokenLifetime":"$AccessTokenLifetime"}}') -DisplayName "$AzureADApplicationId-TokenLifetimePolicy" -IsOrganizationDefault $false -Type "TokenLifetimePolicy"
+$policy = New-AzureADPolicy -Definition @($jsonPayload) -DisplayName "$AzureADApplicationId-TokenLifetimePolicy" -IsOrganizationDefault $false -Type "TokenLifetimePolicy"
 
 # Fetch service principal of target reg
 $servicePrincipal = Get-AzureADServicePrincipal -Filter "AppId eq '$AzureADApplicationId'"
