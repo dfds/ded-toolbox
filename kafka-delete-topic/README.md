@@ -6,8 +6,8 @@ This is a tool for deleting Kafka topics from both the capability service, and f
 
 ### Environment variables
 
-Use the sample_env.txt file to create a .env file, and fill it out with the cluster details. 
-The only value that changes at regular intervals is the BLASTER_BEARER_TOKEN. 
+Use the sample_env.txt file to create a .env file, and fill it out with the cluster details.
+The only value that changes at regular intervals is the BLASTER_BEARER_TOKEN.
 
 You can generate the BLASTER_BEARER_TOKEN using the 'ded' tool.
 
@@ -19,7 +19,7 @@ ded token -a capsvc
 
 In Confluent Kafka generate an API key for each of the two clusters. Save these keys in a secure vault.
 
-### Download ccloud 
+### Download ccloud
 
 ```bash
 curl -L --http1.1 https://cnfl.io/ccloud-cli | sh -s -- -b /usr/local/bin
@@ -35,9 +35,7 @@ ccloud api-key store --resource <cluster-id-for-dev> # Login using API key for d
 ccloud environment use <env-id-for-prod>
 ccloud kafka cluster use <cluster-id-for-prod>
 ccloud api-key store --resource <cluster-id-for-prod> # Login using API key for prod
-
 ```
-
 
 ### Delete topics
 
@@ -52,13 +50,34 @@ source ~/.virtualenvs/housekeeping/bin/activate
 
 Guidelines for developing and testing the scripts.
 
+### Install Poetry
+
+Poetry is a project management tool for Python, which among other things can be used to:
+
+- Create Python projects
+- Manage dependencies
+- Create virtual environments.
+
+**Linux/macOS:**
+
+```bash
+curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python -
+```
+
+**Windows:**
+
+```ps1
+(Invoke-WebRequest -Uri https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py -UseBasicParsing).Content | python -
+```
+
+More information: <https://python-poetry.org/docs/#installation>
+
 ### Virtual environment
 
 ```bash
-mkdir -p ~/.virtualenvs
-virtualenv ~/.virtualenvs/housekeeping
-source ~/.virtualenvs/housekeeping/bin/activate
-python3 -m pip -r requirements_dev.txt
+cd ce-toolbox/kafka-delete-topic
+poetry shell
+poetry install
 ```
 
 ### Testing and code coverage
@@ -66,6 +85,7 @@ python3 -m pip -r requirements_dev.txt
 There are currently no test cases, but this is how testing would look like:
 
 ```bash
+poetry shell
 tox -e flake8
 tox
 ```

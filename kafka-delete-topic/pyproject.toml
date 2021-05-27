@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "capability_service"
+version = "0.1.0"
+description = "This is a tool for deleting Kafka topics from both the capability service, and from Confluent Kafka."
+authors = ["Audun Nes <aunes@dfds.com>"]
+license = "MIT"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+confluent-kafka = "^1.7.0"
+python-dotenv = "^0.17.1"
+requests = "^2.25.1"
+
+[tool.poetry.dev-dependencies]
+coverage = "^5.5"
+flake8 = "^3.9.2"
+tox = "^3.23.1"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
