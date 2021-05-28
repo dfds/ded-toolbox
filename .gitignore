@@ -149,3 +149,9 @@ cython_debug/
 # PyCharm
 
 .idea/
+
+# Visual Studio Code
+.vscode/
+
+# Temporary JSON files
+manage-unused-replicasets/*.json.tmp
