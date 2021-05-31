@@ -153,5 +153,7 @@ cython_debug/
 # Visual Studio Code
 .vscode/
 
-# Temporary JSON files
+# Temporary files
 manage-unused-replicasets/*.json.tmp
+manage-unused-replicasets/*.csv.tmp
+manage-unused-replicasets/*.txt.tmp
