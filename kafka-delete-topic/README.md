@@ -25,6 +25,9 @@ In Confluent Kafka generate an API key for each of the two clusters. Save these 
 curl -L --http1.1 https://cnfl.io/ccloud-cli | sh -s -- -b /usr/local/bin
 ```
 
+For Windows you can either download using curl in Windows Subsystem for Linux, or you can download the
+lastest ccloud binary for Windows from <https://s3-us-west-2.amazonaws.com/confluent.cloud/ccloud-cli/archives/latest/ccloud_latest_windows_amd64.zip>. The unzip the archiv, and place ccloud somewhere in your %PATH%.
+
 ### Configure ccloud
 
 ```bash
@@ -42,7 +45,9 @@ ccloud api-key store --resource <cluster-id-for-prod> # Login using API key for 
 See below in _Development Practices_ how to create the virtual environment.
 
 ```bash
-source ~/.virtualenvs/housekeeping/bin/activate
+cd ce-toolbox/kafka-delete-topic
+poetry shell
+poetry install
 ./delete_topics.py
 ```
 
