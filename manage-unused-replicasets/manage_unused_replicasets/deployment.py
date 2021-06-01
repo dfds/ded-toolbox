@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 import json
 import os
 import subprocess
@@ -19,6 +18,12 @@ class Deployment:
 
     @staticmethod
     def _get_all_deployments_spec() -> list:
+        """
+        Get all deployments in all namespaces and return a list with all the
+        specifications in JSON format.
+
+        :return: list
+        """
         os.environ.get('KUBECONFIG')
         command: str = 'kubectl get deployments -A -o json'
         command_list: list = command.split(' ')
@@ -30,6 +35,12 @@ class Deployment:
         return items
 
     def get_deployments_with_high_revision_history_limit(self) -> list:
+        """
+        Get deployments with a high value for revisionHistoryLimit.
+        In this case 'high' means higher than 10, which is the default.
+
+        :return: list
+        """
         deployments_spec = self._get_all_deployments_spec()
         deployments: list = []
         for item in deployments_spec:
@@ -49,6 +60,10 @@ class Deployment:
         return deployments
 
     def print_deployments_with_high_revision_history_limit(self) -> None:
+        """
+        Print deployments with a high value for revisionHistoryLimit.
+        In this case 'high' means higher than 10, which is the default.
+        """
         deployments: list = self.get_deployments_with_high_revision_history_limit()
         header = deployments[0].keys()
         rows = [deployment.values() for deployment in deployments]
