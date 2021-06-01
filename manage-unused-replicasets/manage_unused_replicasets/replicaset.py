@@ -27,14 +27,14 @@ class ReplicaSet:
 
         :return: list
         """
-        os.environ.get('KUBECONFIG')
-        command: str = f'kubectl get rs -n {namespace} -o json'
-        command_list: list = command.split(' ')
+        os.environ.get("KUBECONFIG")
+        command: str = f"kubectl get rs -n {namespace} -o json"
+        command_list: list = command.split(" ")
         out_file: TextIO = open("replicasets.json.tmp", "w")
         subprocess.run(command_list, stdout=out_file)
-        with open('replicasets.json.tmp') as json_file:
+        with open("replicasets.json.tmp") as json_file:
             data: dict = json.load(json_file)
-            items: list = data.get('items')
+            items: list = data.get("items")
         return items
 
     def get_replicasets(self, namespace: str) -> list:
@@ -50,8 +50,8 @@ class ReplicaSet:
         replicasets: list = []
         for item in replicasets_spec:
             item_with_type_hints: dict = item
-            metadata: dict = item_with_type_hints.get('metadata')
-            name: str = metadata.get('name')
+            metadata: dict = item_with_type_hints.get("metadata")
+            name: str = metadata.get("name")
             replicasets.append(name)
         return replicasets
 
@@ -71,25 +71,27 @@ class ReplicaSet:
         replicasets: list = []
         for item in replicasets_spec:
             item_with_type_hints: dict = item
-            metadata: dict = item_with_type_hints.get('metadata')
-            status: dict = item_with_type_hints.get('status')
+            metadata: dict = item_with_type_hints.get("metadata")
+            status: dict = item_with_type_hints.get("status")
             # This will only have a value if there are available replicas
-            available_replicas: int = status.get('availableReplicas', 0)
+            available_replicas: int = status.get("availableReplicas", 0)
             # This will only have a value if there are ready replicas
-            ready_replicas: int = status.get('readyReplicas', 0)
-            replicas: int = status.get('replicas')  # This will always have a value
+            ready_replicas: int = status.get("readyReplicas", 0)
+            replicas: int = status.get("replicas")  # This will always have a value
             if available_replicas == 0 and ready_replicas == 0 and replicas == 0:
                 try:
                     owner_references: list = metadata.get("ownerReferences")
-                    application: str = owner_references[0]['name']
-                    if (application == deployment_name):
-                        name: str = metadata.get('name')
+                    application: str = owner_references[0]["name"]
+                    if application == deployment_name:
+                        name: str = metadata.get("name")
                         replicasets.append(name)
                 except TypeError:
-                    print('The ownerReferences field is empty. Skipping.')
+                    print("The ownerReferences field is empty. Skipping.")
         return replicasets
 
-    def get_number_of_unused_replicasets_per_deployment(self, namespace: str, deployment_name: str) -> int:
+    def get_number_of_unused_replicasets_per_deployment(
+        self, namespace: str, deployment_name: str
+    ) -> int:
         """
         Get a count of unused replicasets in a namespace that belongs to a named deployment.
 
@@ -100,7 +102,9 @@ class ReplicaSet:
 
         :return: int
         """
-        unused_replicasets: list = self.get_unused_replicasets(namespace, deployment_name)
+        unused_replicasets: list = self.get_unused_replicasets(
+            namespace, deployment_name
+        )
         return len(unused_replicasets)
 
     @staticmethod
@@ -120,13 +124,33 @@ class ReplicaSet:
                             for deployments that have a high revisionHistoryLimit.
         :type deployments: list
         """
-        with open('problematic-deployments.csv.tmp', 'w', newline='') as csvfile:
-            dp_writer = csv.writer(csvfile, delimiter=',')
-            dp_writer.writerow(['Namespace', 'Deployment name', 'API version', 'Limit', 'Replicasets#', 'Over quota#'])
+        with open("problematic-deployments.csv.tmp", "w", newline="") as csvfile:
+            dp_writer = csv.writer(csvfile, delimiter=",")
+            dp_writer.writerow(
+                [
+                    "Namespace",
+                    "Deployment name",
+                    "API version",
+                    "Limit",
+                    "Replicasets#",
+                    "Over quota#",
+                ]
+            )
             for deployment in deployments:
-                namespace: str = deployment.get('namespace')
-                name: str = deployment.get('name')
-                api_version: str = deployment.get('api_version')
-                revision_history_limit: str = deployment.get('revision_history_limit')
-                count: int = self.get_number_of_unused_replicasets_per_deployment(namespace, name)
-                dp_writer.writerow([namespace, name, api_version, revision_history_limit, count, self.get_num_of_delete_candidates(count)])
+                namespace: str = deployment.get("namespace")
+                name: str = deployment.get("name")
+                api_version: str = deployment.get("api_version")
+                revision_history_limit: str = deployment.get("revision_history_limit")
+                count: int = self.get_number_of_unused_replicasets_per_deployment(
+                    namespace, name
+                )
+                dp_writer.writerow(
+                    [
+                        namespace,
+                        name,
+                        api_version,
+                        revision_history_limit,
+                        count,
+                        self.get_num_of_delete_candidates(count),
+                    ]
+                )

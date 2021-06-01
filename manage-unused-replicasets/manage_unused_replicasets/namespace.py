@@ -26,7 +26,9 @@ class Namespace:
         Get a list of namespaces.
         :return: list
         """
-        namespaces_definition: client.V1NamespaceList = self._get_namespaces_definition()
+        namespaces_definition: client.V1NamespaceList = (
+            self._get_namespaces_definition()
+        )
         namespaces: list = []
         for item in namespaces_definition.items:
             namespaces.append(item.metadata.name)

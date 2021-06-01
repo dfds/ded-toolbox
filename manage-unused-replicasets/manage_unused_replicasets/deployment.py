@@ -24,14 +24,14 @@ class Deployment:
 
         :return: list
         """
-        os.environ.get('KUBECONFIG')
-        command: str = 'kubectl get deployments -A -o json'
-        command_list: list = command.split(' ')
+        os.environ.get("KUBECONFIG")
+        command: str = "kubectl get deployments -A -o json"
+        command_list: list = command.split(" ")
         out_file: TextIO = open("deployments.json.tmp", "w")
         subprocess.run(command_list, stdout=out_file)
-        with open('deployments.json.tmp') as json_file:
+        with open("deployments.json.tmp") as json_file:
             data: dict = json.load(json_file)
-            items: list = data.get('items')
+            items: list = data.get("items")
         return items
 
     def get_deployments_with_high_revision_history_limit(self) -> list:
@@ -45,17 +45,21 @@ class Deployment:
         deployments: list = []
         for item in deployments_spec:
             item_with_type_hints: dict = item
-            metadata: dict = item_with_type_hints.get('metadata')
-            namespace: str = metadata.get('namespace')
-            name: str = metadata.get('name')
-            api_version: str = item_with_type_hints.get('apiVersion')
-            spec: dict = item_with_type_hints.get('spec')
-            revision_history_limit: int = spec.get('revisionHistoryLimit', 10)  # Setting to 10 if not specified.
+            metadata: dict = item_with_type_hints.get("metadata")
+            namespace: str = metadata.get("namespace")
+            name: str = metadata.get("name")
+            api_version: str = item_with_type_hints.get("apiVersion")
+            spec: dict = item_with_type_hints.get("spec")
+            revision_history_limit: int = spec.get(
+                "revisionHistoryLimit", 10
+            )  # Setting to 10 if not specified.
             if revision_history_limit > 10:
-                problematic_deployment: dict = {'namespace': namespace,
-                                                'name': name,
-                                                'api_version': api_version,
-                                                'revision_history_limit': revision_history_limit}
+                problematic_deployment: dict = {
+                    "namespace": namespace,
+                    "name": name,
+                    "api_version": api_version,
+                    "revision_history_limit": revision_history_limit,
+                }
                 deployments.append(problematic_deployment)
         return deployments
 
@@ -86,14 +90,18 @@ class Deployment:
             dp = self.get_deployments_with_high_revision_history_limit()
         else:
             dp = deployments
-        script_file: str = 'problematic-deployments.sh.tmp'
-        with open(script_file, 'w') as writer:
-            writer.write('!#/bin/bash\n')
+        script_file: str = "problematic-deployments.sh.tmp"
+        with open(script_file, "w") as writer:
+            writer.write("!#/bin/bash\n")
             patch: str = '\'[{"op": "replace", "path": "/spec/revisionHistoryLimit", "value": 10}]\''
             for deployment in dp:
-                namespace: str = deployment.get('namespace')
-                name: str = deployment.get('name')
-                writer.write(f'kubectl patch deployment -n {namespace} {name} --type=json -p={patch}\n')
+                namespace: str = deployment.get("namespace")
+                name: str = deployment.get("name")
+                writer.write(
+                    f"kubectl patch deployment -n {namespace} {name} --type=json -p={patch}\n"
+                )
         print(f'{script_file} was created with "kubectl patch deployments" commands')
-        print('You can use this script to change the revisionHistoryLimit.')
-        print(f'Usage: export KUBECONFIG=<REDACTED> && chmod +x {script_file} && ./{script_file}')
+        print("You can use this script to change the revisionHistoryLimit.")
+        print(
+            f"Usage: export KUBECONFIG=<REDACTED> && chmod +x {script_file} && ./{script_file}"
+        )

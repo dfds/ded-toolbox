@@ -4,7 +4,7 @@ from manage_unused_replicasets.namespace import Namespace
 from manage_unused_replicasets.replicaset import ReplicaSet
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     ns: Namespace = Namespace()
     # namespaces: list = ns.get_namespaces()
 
