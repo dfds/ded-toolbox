@@ -18,3 +18,18 @@ It also contains a Python script called manage_unused_replicasets.py that can be
     - Get a list deployments with high revision history limit
     - Create a comma separated report file with the above list
     - Create a text file with commands to reduce the revisionHistoryLimit in deployments to 10
+
+## Requirements
+
+You need to set the KUBECONFIG environment variable prior to running manage_unused_replicasets.py
+
+## Usage
+
+Please note that this script is non-desctructive. It will not change anything. It will just create
+reports and scripts you can later use to make changes to the deployments.
+
+```bash
+poetry install
+poetry shell
+./manage_unused_replicasets.py
+```
