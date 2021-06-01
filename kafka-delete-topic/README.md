@@ -26,7 +26,7 @@ curl -L --http1.1 https://cnfl.io/ccloud-cli | sh -s -- -b /usr/local/bin
 ```
 
 For Windows you can either download using curl in Windows Subsystem for Linux, or you can download the
-lastest ccloud binary for Windows from <https://s3-us-west-2.amazonaws.com/confluent.cloud/ccloud-cli/archives/latest/ccloud_latest_windows_amd64.zip>. The unzip the archiv, and place ccloud somewhere in your %PATH%.
+lastest ccloud binary for Windows from <https://s3-us-west-2.amazonaws.com/confluent.cloud/ccloud-cli/archives/latest/ccloud_latest_windows_amd64.zip>. If you do the latter, then unzip the archive, and place the ccloud executable somewhere in your %PATH%.
 
 ### Configure ccloud
 
