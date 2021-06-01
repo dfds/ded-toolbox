@@ -154,6 +154,4 @@ cython_debug/
 .vscode/
 
 # Temporary files
-manage-unused-replicasets/*.json.tmp
-manage-unused-replicasets/*.csv.tmp
-manage-unused-replicasets/*.txt.tmp
+manage-unused-replicasets/*.tmp
