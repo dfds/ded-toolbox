@@ -1,6 +1,8 @@
+import csv
 import json
 import os
 import subprocess
+
 from typing import TextIO
 
 
@@ -100,3 +102,31 @@ class ReplicaSet:
         """
         unused_replicasets: list = self.get_unused_replicasets(namespace, deployment_name)
         return len(unused_replicasets)
+
+    @staticmethod
+    def get_num_of_delete_candidates(num: int, limit: int = 10) -> int:
+        if num <= limit:
+            return 0
+        else:
+            return num - limit
+
+    def create_cvs_report_with_unused_replicasets(self, deployments: list) -> None:
+        """
+        Create a comma separated file with information about unused repliacasets that
+        belongs to deployments with a high revisionHistoryLimit.
+
+        :param deployments: A list of dictionary objects that contains the namespace,
+                            deployment name, api version and revisionHistoryLimit value
+                            for deployments that have a high revisionHistoryLimit.
+        :type deployments: list
+        """
+        with open('problematic-deployments.csv.tmp', 'w', newline='') as csvfile:
+            dp_writer = csv.writer(csvfile, delimiter=',')
+            dp_writer.writerow(['Namespace', 'Deployment name', 'API version', 'Limit', 'Replicasets#', 'Over quota#'])
+            for deployment in deployments:
+                namespace: str = deployment.get('namespace')
+                name: str = deployment.get('name')
+                api_version: str = deployment.get('api_version')
+                revision_history_limit: str = deployment.get('revision_history_limit')
+                count: int = self.get_number_of_unused_replicasets_per_deployment(namespace, name)
+                dp_writer.writerow([namespace, name, api_version, revision_history_limit, count, self.get_num_of_delete_candidates(count)])
