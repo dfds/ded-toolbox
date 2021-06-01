@@ -1,10 +1,7 @@
-#!/usr/bin/env python3
 import json
 import os
 import subprocess
 from typing import TextIO
-
-from tabulate import tabulate
 
 
 class ReplicaSet:
@@ -19,6 +16,15 @@ class ReplicaSet:
 
     @staticmethod
     def _get_replicasets_spec(namespace: str) -> list:
+        """
+        Get all replicasets in a namespace and return a list with all the
+        specifications in JSON format.
+
+        :param namespace: The namespace in which we want to check the replicasets.
+        :type namespace: str
+
+        :return: list
+        """
         os.environ.get('KUBECONFIG')
         command: str = f'kubectl get rs -n {namespace} -o json'
         command_list: list = command.split(' ')
@@ -30,6 +36,14 @@ class ReplicaSet:
         return items
 
     def get_replicasets(self, namespace: str) -> list:
+        """
+        Get all replicasets in a namespace and return a list their names.
+
+        :param namespace: The namespace in which we want to check the replicasets.
+        :type namespace: str
+
+        :return: list
+        """
         replicasets_spec = self._get_replicasets_spec(namespace)
         replicasets: list = []
         for item in replicasets_spec:
@@ -40,6 +54,17 @@ class ReplicaSet:
         return replicasets
 
     def get_unused_replicasets(self, namespace: str, deployment_name: str) -> list:
+        """
+        Get all a list of replicasets in a namespace that belongs to a named
+        deployment, and that are currently unused.
+
+        :param namespace: The namespace in which we want to check the replicasets.
+        :param deployment_name: A deployment name that owns replicasets.
+        :type namespace: str
+        :type deployment_name: str
+
+        :return: list
+        """
         replicasets_spec = self._get_replicasets_spec(namespace)
         replicasets: list = []
         for item in replicasets_spec:
@@ -63,5 +88,15 @@ class ReplicaSet:
         return replicasets
 
     def get_number_of_unused_replicasets_per_deployment(self, namespace: str, deployment_name: str) -> int:
+        """
+        Get a count of unused replicasets in a namespace that belongs to a named deployment.
+
+        :param namespace: The namespace in which we want to check the replicasets.
+        :param deployment_name: A deployment name that owns replicasets.
+        :type namespace: str
+        :type deployment_name: str
+
+        :return: int
+        """
         unused_replicasets: list = self.get_unused_replicasets(namespace, deployment_name)
         return len(unused_replicasets)
