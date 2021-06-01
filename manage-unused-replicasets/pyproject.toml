@@ -8,11 +8,11 @@ authors = ["Audun Nes <aunes@dfds.com>"]
 python = "^3.9"
 kubernetes = "^17.17.0"
 tabulate = "^0.8.9"
-black = "^21.5b2"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
 flake8 = "^3.9.2"
+black = "^21.5b2"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
