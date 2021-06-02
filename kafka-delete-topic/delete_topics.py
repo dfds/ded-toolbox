@@ -14,13 +14,14 @@ def main():
         blaster_topics_api_url=config.blaster_topics_api_url,
         blaster_cluster_uuid=config.blaster_cluster_uuid,
         confluent_env_id=config.confluent_env_id,
-        confluent_cluster_id=config.confluent_cluster_id,
-        level=logging.DEBUG,
+        confluent_cluster_id=config.confluent_cluster_id
     )
 
-    # This is where you need to add the topics you want to delete.
-    topics_data: list = ["pub.sandbox-aunes-kkpbj.foo", "pub.sandbox-aunes-kkpbj.bar"]
-
+    topics_data: list = []
+    with open("topics.list", "r") as topics_file:
+        all_lines: list = topics_file.readlines()
+        for line in all_lines:
+            topics_data.append(line.strip())  # This is to remove linebreaks
     topic.delete_topics(topics_data)
 
 

@@ -4,6 +4,11 @@ This is a tool for deleting Kafka topics from both the capability service, and f
 
 ## Usage
 
+### Define topics to delete
+
+- Create file topics.list from topics.sample
+- Add one topic name per line in topics.sample
+
 ### Environment variables
 
 Use the sample_env.txt file to create a .env file, and fill it out with the cluster details.
