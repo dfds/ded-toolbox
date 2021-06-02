@@ -15,6 +15,8 @@ You can generate the BLASTER_BEARER_TOKEN using the 'ded' tool.
 ded token -a capsvc
 ```
 
+You must also specify a value for KAFKA_ENV in .env file prior to deleting topics. Valid values are DEV and PROD depending on which environment you want to delete topics from. You can only delete topics from one environment at a time.
+
 ### Confluent API keys
 
 In Confluent Kafka generate an API key for each of the two clusters. Save these keys in a secure vault.
@@ -91,6 +93,7 @@ There are currently no test cases, but this is how testing would look like:
 
 ```bash
 poetry shell
+black *.py
+black capability_service/*.py
 tox -e flake8
-tox
 ```
