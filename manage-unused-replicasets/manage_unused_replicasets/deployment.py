@@ -92,7 +92,7 @@ class Deployment:
             dp = deployments
         script_file: str = "problematic-deployments.sh.tmp"
         with open(script_file, "w") as writer:
-            writer.write("!#/bin/bash\n")
+            writer.write("#!/bin/bash\n")
             patch: str = '\'[{"op": "replace", "path": "/spec/revisionHistoryLimit", "value": 10}]\''
             for deployment in dp:
                 namespace: str = deployment.get("namespace")
