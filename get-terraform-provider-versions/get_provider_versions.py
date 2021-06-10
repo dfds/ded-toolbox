@@ -3,8 +3,17 @@ import getopt
 import os
 import tempfile
 import subprocess
+import logging
 
-from get_terraform_provider_versions.get_tf_provider_versions import TerraformProvider
+from get_terraform_provider_versions.get_tf_provider_versions import (
+    TerraformProviders,
+    show_usage,
+    parse_terraform_file,
+)
+from github.repo import Repo
+
+GITHUB_ORGANIZATION = "dfds"
+
 
 def main(argv):
 
@@ -53,10 +62,9 @@ def main(argv):
         sub_directories = os.listdir(source_base)
         for sub_directory in sub_directories:
             if sub_directory in excluded_repos:
-                logging.info(
-                    f"Skipping repository {sub_directory}, because it has \
-                    been explicitely excluded using the -e parameter."
-                )
+                info_msg: str = f"Skipping repository {sub_directory}, because it"
+                info_msg += " has been explicitely excluded using the -e parameter."
+                logging.info(info_msg)
             else:
                 if len(process_repository) == 0 or sub_directory in process_repository:
                     sub_directory_path = os.path.join(source_base, sub_directory)
@@ -76,7 +84,6 @@ def main(argv):
                                             used_providers,
                                         )
                                     )
-                                    break
                                 else:
                                     continue
     else:
@@ -84,7 +91,7 @@ def main(argv):
         if token is None:
             logging.error(
                 "A GitHub OAUTH2 Token has not been defined in the \
-                GITHUB_OAUTH2_TOKEN environment variable."
+GITHUB_OAUTH2_TOKEN environment variable."
             )
             logging.error("The script cannot continue and will now terminate.")
             sys.exit(3)
@@ -121,19 +128,19 @@ def main(argv):
                     if is_archived:
                         logging.info(
                             f"Skipping repository {name}, \
-                            because this repo has been archived."
+because this repo has been archived."
                         )
                     elif is_disabled:
                         logging.info(
                             f"Skipping repository {name}, \
-                            because this repo has been disabled."
+because this repo has been disabled."
                         )
                     else:
                         repo_has_hcl = repo.does_repo_contain_hcl(name)
                         if repo_has_hcl:
                             logging.info(
                                 f"Performing Terraform provider \
-                                analysis on the repository {name}."
+analysis on the repository {name}."
                             )
 
                             f = tempfile.TemporaryDirectory()
@@ -143,10 +150,9 @@ def main(argv):
                             clone_url: str = r.get("clone_url")
                             clone_command: str = f"git clone {clone_url} {f.name} -q"
                             logging.info(
-                                "\tCreating a local Clone of the \
-                                GitHub repository."
+                                "\tCreating a local Clone of the GitHub repository."
                             )
-                            subprocess.call(clone_command, shell=True)
+                            subprocess.run(clone_command.split(" "), shell=True)
                             logging.info("\tClone complete.")
 
                             source_base: str = f.name
@@ -171,24 +177,19 @@ def main(argv):
                         else:
                             logging.info(
                                 f"Skipping Terraform provider analysis \
-                                on the repository {name} because it does not \
-                                    contain HCL code."
+on the repository {name} because it does not \
+contain HCL code."
                             )
 
     used_providers.get_latest_versions()
 
     if output_format == "csv":
-        print(
-            "Repository Name,Terraform File,Provider Name,Version Used,\
-            Latest Version,Comment"
-        )
+        out_str: str = "Repository Name,Terraform File,Provider Name"
+        out_str += ",Version Used,Latest Version,Comment"
+        print(out_str)
         for provider in used_providers:
-            print_str: str = f"{provider.repository_name}, \
-                              {provider.file_path}, \
-                              {provider.provider_name},"
-            print_str += f"{provider.provider_version}, \
-                          {provider.latest_provider_version}, \
-                          {provider.comment}"
+            print_str: str = f"{provider.repository_name},{provider.file_path},{provider.provider_name},"  # noqa E501
+            print_str += f"{provider.provider_version},{provider.latest_provider_version},{provider.comment}"  # noqa E501
             print(print_str)
 
     if output_format == "json":
@@ -201,10 +202,7 @@ def main(argv):
         print("")
         print("Provider Count: ", used_providers.count())
         print("")
-        print_str: str = f'\033[1m{"Repository Name" : <30}\
-                {"Terraform File" : <60}\
-                    {"Provider Name" : <30}\
-                        {"Version Used" : <15}'
+        print_str: str = f'\033[1m{"Repository Name" : <30}{"Terraform File" : <60}{"Provider Name" : <30}{"Version Used" : <15}'  # noqa E501
         print_str += f'{"Latest Version" : <20}{"Comment" : <20}{"" : <1}\033[0m'
         if plain_output:
             print_str = print_str.replace("\033[1m", "").replace("\033[0m", "")
@@ -220,13 +218,8 @@ def main(argv):
                 colour_code = "\033[36m"
             if plain_output:
                 colour_code = ""
-            print_str: str = f"{colour_code}\
-                    {provider.repository_name : <30}\
-                        {provider.file_path : <60}\
-                            {provider.provider_name : <30}"
-            print_str += f"{provider.provider_version : <15}\
-                {provider.latest_provider_version : <20}\
-                    {provider.comment : <30}"
+            print_str: str = f"{colour_code}{provider.repository_name : <30}{provider.file_path : <60}{provider.provider_name : <30}"  # noqa E501
+            print_str += f"{provider.provider_version : <15}{provider.latest_provider_version : <20}{provider.comment : <30}"  # noqa E501
             if plain_output is False:
                 print_str += f"{COLOUR_END_CODE}"
             print(print_str)

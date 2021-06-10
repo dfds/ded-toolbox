@@ -1,10 +1,8 @@
 import re
 import logging
 import requests
+import json
 
-from github.repo import Repo
-
-GITHUB_ORGANIZATION = "dfds"
 TFREGISTRY_BASEAPI = "https://registry.terraform.io/v1/providers/"
 
 
@@ -54,16 +52,8 @@ class TerraformProviders:
         """
         json_string: str = "["
         for provider in self.terraform_providers:
-            json_string += '{"repository_name":'
-            json_string += f'"{provider.repository_name}",'
-            json_string += f'"terraform_file":"{provider.file_path}",'
-            json_string += f'"provider_name":"{provider.provider_name}",'
-            json_string += f'"version_used":"{provider.provider_version}",'
-            json_string += f'"latest_version":"{provider.latest_provider_version}",'
-            json_string += f'"comment":"{provider.comment}"'
-            json_string += "},"
+            json_string += (json.dumps(provider.__dict__)) + ","
         json_string = json_string.strip(",") + "]"
-        json_string = json_string.replace("\\", "\\\\")
         return json_string
 
     def get_latest_versions(self):
@@ -126,6 +116,7 @@ def parse_terraform_file(
 
         for line in reader:
             current_line: str = line.strip()
+            # print(current_line)
             if provider_matching:
                 if current_line.find("{") > -1:
                     brace_count = brace_count + (current_line.count("{"))
@@ -140,7 +131,7 @@ def parse_terraform_file(
                     )
                 if re.search('^version *= *".*"', current_line.strip()):
                     current_provider_version = (
-                        current_line[current_line.find("=") + 1:]
+                        current_line[current_line.find("=") + 1 :]
                         .replace('"', "")
                         .strip()
                     )
@@ -149,13 +140,14 @@ def parse_terraform_file(
                         current_provider_version = "Latest"
                     new_used_provider = TerraformProvider(
                         repository_name,
-                        file_path.replace(temp_folder, ""),  # noqa e501
+                        file_path.replace(temp_folder, ""),
                         current_provider_name,
                         current_provider_version,
                     )
                     used_providers.append(new_used_provider)
             if current_line.startswith("#") is False:
                 if re.search("required_providers", current_line):
+                    print("Provider matching toggled on")
                     provider_matching = True
                     brace_count = brace_count + (current_line.count("{"))
     return used_providers
@@ -196,5 +188,3 @@ All parameters are optional
      -h
         Display this help information."""
     print(out_str)
-
-
