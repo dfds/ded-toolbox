@@ -62,8 +62,10 @@ def main(argv):
         sub_directories = os.listdir(source_base)
         for sub_directory in sub_directories:
             if sub_directory in excluded_repos:
-                info_msg: str = f"Skipping repository {sub_directory}, because it"
-                info_msg += " has been explicitely excluded using the -e parameter."
+                info_msg: str = (
+                    f"Skipping repository {sub_directory}, because it"
+                    " has been explicitely excluded using the -e parameter."
+                )
                 logging.info(info_msg)
             else:
                 if len(process_repository) == 0 or sub_directory in process_repository:
@@ -184,12 +186,17 @@ contain HCL code."
     used_providers.get_latest_versions()
 
     if output_format == "csv":
-        out_str: str = "Repository Name,Terraform File,Provider Name"
-        out_str += ",Version Used,Latest Version,Comment"
+        out_str: str = (
+            "Repository Name,Terraform File,Provider Name"
+            ",Version Used,Latest Version,Comment"
+        )
         print(out_str)
         for provider in used_providers:
-            print_str: str = f"{provider.repository_name},{provider.file_path},{provider.provider_name},"  # noqa E501
-            print_str += f"{provider.provider_version},{provider.latest_provider_version},{provider.comment}"  # noqa E501
+            print_str: str = (
+                f"{provider.repository_name},{provider.file_path},"
+                f"{provider.provider_name},{provider.provider_version},"
+                f"{provider.latest_provider_version},{provider.comment}"
+            )
             print(print_str)
 
     if output_format == "json":
@@ -202,8 +209,11 @@ contain HCL code."
         print("")
         print("Provider Count: ", used_providers.count())
         print("")
-        print_str: str = f'\033[1m{"Repository Name" : <30}{"Terraform File" : <60}{"Provider Name" : <30}{"Version Used" : <15}'  # noqa E501
-        print_str += f'{"Latest Version" : <20}{"Comment" : <20}{"" : <1}\033[0m'
+        print_str: str = (
+            f'\033[1m{"Repository Name" : <30}{"Terraform File" : <60}'
+            f'{"Provider Name" : <30}{"Version Used" : <15}'
+            f'{"Latest Version" : <20}{"Comment" : <20}{"" : <1}\033[0m'
+        )
         if plain_output:
             print_str = print_str.replace("\033[1m", "").replace("\033[0m", "")
         print(print_str)
@@ -218,8 +228,13 @@ contain HCL code."
                 colour_code = "\033[36m"
             if plain_output:
                 colour_code = ""
-            print_str: str = f"{colour_code}{provider.repository_name : <30}{provider.file_path : <60}{provider.provider_name : <30}"  # noqa E501
-            print_str += f"{provider.provider_version : <15}{provider.latest_provider_version : <20}{provider.comment : <30}"  # noqa E501
+            print_str: str = (
+                f"{colour_code}{provider.repository_name : <30}"
+                f"{provider.file_path : <60}{provider.provider_name : <30}"
+                f"{provider.provider_version : <15}"
+                f"{provider.latest_provider_version : <20}"
+                f"{provider.comment : <30}"
+            )
             if plain_output is False:
                 print_str += f"{COLOUR_END_CODE}"
             print(print_str)
