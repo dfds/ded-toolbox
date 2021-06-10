@@ -3,7 +3,7 @@ import logging
 import requests
 from requests import Response
 
-API_URL: str = 'https://api.github.com'
+API_URL: str = "https://api.github.com"
 
 
 class HttpUtil:
@@ -17,7 +17,8 @@ class HttpUtil:
         :type level: int
         """
         logging.basicConfig(
-            format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=level)
+            format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=level
+        )
         self.token: str = token
 
     def get(self, url: str, params: dict = None) -> dict:
@@ -28,10 +29,11 @@ class HttpUtil:
         :type params: dict
         :return: dict
         """
-        headers: dict = {'Accept': 'application/vnd.github.v3+json',
-                         'Authorization': f'token {self.token}'}
-        response: Response = requests.get(
-            url=url, headers=headers, params=params)
+        headers: dict = {
+            "Accept": "application/vnd.github.v3+json",
+            "Authorization": f"token {self.token}",
+        }
+        response: Response = requests.get(url=url, headers=headers, params=params)
         return response.json()
 
     def post(self, url: str, payload: dict) -> Response:
@@ -42,10 +44,11 @@ class HttpUtil:
         :type payload: dict
         :return: requests.Response
         """
-        headers: dict = {'Accept': 'application/vnd.github.luke-cage-preview+json',
-                         'Authorization': f'token {self.token}'}
-        response: Response = requests.post(
-            url=url, headers=headers, json=payload)
+        headers: dict = {
+            "Accept": "application/vnd.github.luke-cage-preview+json",
+            "Authorization": f"token {self.token}",
+        }
+        response: Response = requests.post(url=url, headers=headers, json=payload)
         return response
 
     def put(self, url: str, payload: dict) -> Response:
@@ -56,10 +59,11 @@ class HttpUtil:
         :type payload: dict
         :return: requests.Response
         """
-        headers: dict = {'Accept': 'application/vnd.github.luke-cage-preview+json',
-                         'Authorization': f'token {self.token}'}
-        response: Response = requests.put(
-            url=url, headers=headers, json=payload)
+        headers: dict = {
+            "Accept": "application/vnd.github.luke-cage-preview+json",
+            "Authorization": f"token {self.token}",
+        }
+        response: Response = requests.put(url=url, headers=headers, json=payload)
         return response
 
 
@@ -76,7 +80,8 @@ class Repo:
         :type level: int
         """
         logging.basicConfig(
-            format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=level)
+            format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=level
+        )
         self.http_utils: HttpUtil = HttpUtil(token)
         self.owner: str = owner
 
@@ -84,29 +89,32 @@ class Repo:
         """Private method for counting the number of private repositories in the organization.
         :return: int
         """
-        data: dict = self.http_utils.get(url=f'{API_URL}/orgs/{self.owner}')
-        count: int = data.get('total_private_repos')
+        data: dict = self.http_utils.get(url=f"{API_URL}/orgs/{self.owner}")
+        count: int = data.get("total_private_repos")
         return count
 
     def _get_number_of_public_repos(self) -> int:
         """Private method for counting the number of public repositories in the organization.
         :return: int
         """
-        data: dict = self.http_utils.get(url=f'{API_URL}/orgs/{self.owner}')
-        count: int = data.get('public_repos')
+        data: dict = self.http_utils.get(url=f"{API_URL}/orgs/{self.owner}")
+        count: int = data.get("public_repos")
         return count
 
     def _get_number_of_repos(self) -> int:
         """Private method for counting the total number of repositories in the organization.
         :return: int
         """
-        count: int = self._get_number_of_public_repos() + self._get_number_of_private_repos()
+        count: int = (
+            self._get_number_of_public_repos() + self._get_number_of_private_repos()
+        )
         return count
 
     def get_all_repos(self, limit: int = None) -> list:
         """Get a list of all the repositories in the organization.
-        :param limit: Instead of fetching all repositories, you can opt to just fetch the 'n' first repositories sorted
-        alphabetically. This is useful during development or diagnostics. Default: None.
+        :param limit: Instead of fetching all repositories, you can opt to just
+        fetch the 'n' first repositories sorted alphabetically. This is useful
+        during development or diagnostics. Default: None.
         :return: list
         """
         all_repos: list = []
@@ -119,10 +127,15 @@ class Repo:
             page_counter += 1
             if number_of_repos_left < page_limit:
                 page_limit = number_of_repos_left
-            params: dict = {'type': 'all', 'sort': 'full_name',
-                            'per_page': page_limit, 'page': page_counter}
+            params: dict = {
+                "type": "all",
+                "sort": "full_name",
+                "per_page": page_limit,
+                "page": page_counter,
+            }
             fragment: dict = self.http_utils.get(
-                url=f'{API_URL}/orgs/{self.owner}/repos', params=params)
+                url=f"{API_URL}/orgs/{self.owner}/repos", params=params
+            )
             all_repos.append(fragment)
             if number_of_repos_left >= page_limit:
                 number_of_repos_left -= page_limit
@@ -130,43 +143,33 @@ class Repo:
 
     def does_repo_exist(self, name: str) -> bool:
         repo_data: dict = self.http_utils.get(
-            url=f'{API_URL}/repos/{self.owner}/{name}')
-        if 'message' in repo_data:
+            url=f"{API_URL}/repos/{self.owner}/{name}"
+        )
+        if "message" in repo_data:
             return False
         else:
             return True
 
     def does_repo_contain_hcl(self, name: str) -> bool:
         repo_data: dict = self.http_utils.get(
-            url=f'{API_URL}/repos/{self.owner}/{name}')
-        language_url: str = (repo_data['languages_url'])
-        language_data: dict = self.http_utils.get(
-            url=language_url)
-        if 'HCL' in language_data:
+            url=f"{API_URL}/repos/{self.owner}/{name}"
+        )
+        language_url: str = repo_data["languages_url"]
+        language_data: dict = self.http_utils.get(url=language_url)
+        if "HCL" in language_data:
             return True
         else:
             return False
 
     def get_repo(self, name: str) -> list:
-        """ Retrieve the parameters of a specific named Github repository.
+        """Retrieve the parameters of a specific named Github repository.
         :param name: The name of the Github repository to retrieve data for.
         :return: list
         """
-        toplevel: list = []
         repos: list = []
-        fragment: dict = self.http_utils.get(
-            url=f'{API_URL}/repos/{self.owner}/{name}')
+        fragment: dict = self.http_utils.get(url=f"{API_URL}/repos/{self.owner}/{name}")
         repos.append(fragment)
-        #toplevel.append(repos)
         return repos
-
-    @staticmethod
-    def get_protected_repos() -> list:
-        """
-        Get a list of protected repositories, i.e. repos that should not have set new branch protection rules.
-        :return: list
-        """
-        return PROTECTED_REPOS
 
     def get_default_branch(self, repo_name: str) -> str:
         """Find the default branch for a given repository.
@@ -174,9 +177,8 @@ class Repo:
         :type repo_name: str
         :return: str
         """
-        data: dict = self.http_utils.get(
-            f'{API_URL}/repos/{self.owner}/{repo_name}')
-        return data.get('default_branch')
+        data: dict = self.http_utils.get(f"{API_URL}/repos/{self.owner}/{repo_name}")
+        return data.get("default_branch")
 
     def is_repo_archived(self, repo_name: str) -> bool:
         """
@@ -185,9 +187,8 @@ class Repo:
         :type repo_name: str
         :return: bool
         """
-        data: dict = self.http_utils.get(
-            f'{API_URL}/repos/{self.owner}/{repo_name}')
-        is_archived: bool = data.get('archived', False)
+        data: dict = self.http_utils.get(f"{API_URL}/repos/{self.owner}/{repo_name}")
+        is_archived: bool = data.get("archived", False)
         return is_archived
 
     def is_repo_disabled(self, repo_name: str) -> bool:
@@ -197,7 +198,6 @@ class Repo:
         :type repo_name: str
         :return: bool
         """
-        data: dict = self.http_utils.get(
-            f'{API_URL}/repos/{self.owner}/{repo_name}')
-        is_disabled: bool = data.get('disabled', False)
+        data: dict = self.http_utils.get(f"{API_URL}/repos/{self.owner}/{repo_name}")
+        is_disabled: bool = data.get("disabled", False)
         return is_disabled

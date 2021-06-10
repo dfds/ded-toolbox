@@ -14,11 +14,13 @@ A valid GitHub OAuth2 Token needs to be obtained and set using the environment v
 
 ### Testing and code coverage
 
-There are currently no test cases, but this is how testing would look like:
+There are currently no test cases, but the following commands can be used to confirm code formatting
+consistentcy and layout:
 
 ```bash
-tox -e flake8
-tox
+poetry run black .
+poetry run flake8
+poetry run pytest
 ```
 
 ## Usage
