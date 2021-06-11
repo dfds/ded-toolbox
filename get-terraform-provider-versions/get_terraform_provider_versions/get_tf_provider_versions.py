@@ -147,7 +147,6 @@ def parse_terraform_file(
                     used_providers.append(new_used_provider)
             if current_line.startswith("#") is False:
                 if re.search("required_providers", current_line):
-                    print("Provider matching toggled on")
                     provider_matching = True
                     brace_count = brace_count + (current_line.count("{"))
     return used_providers
