@@ -87,14 +87,21 @@ class TerraformProviders:
                     if (
                         locked_version[0] == latest_version[0]
                         and locked_version[1] == latest_version[1]
-                        and locked_version[2] != latest_version[2]
+                        and locked_version[2] == latest_version[2]
                     ):
-                        provider.comment = "Patch update only."
+                        provider.comment = "Latest version will be used."
                     else:
-                        if locked_version[1] != latest_version[1]:
-                            provider.comment = "Minor version update available."
-                        if locked_version[0] != latest_version[0]:
-                            provider.comment = "Major version update available."
+                        if (
+                            locked_version[0] == latest_version[0]
+                            and locked_version[1] == latest_version[1]
+                            and locked_version[2] != latest_version[2]
+                        ):
+                            provider.comment = "Patch update only."
+                        else:
+                            if locked_version[1] != latest_version[1]:
+                                provider.comment = "Minor version update available."
+                            if locked_version[0] != latest_version[0]:
+                                provider.comment = "Major version update available."
 
 
 # function to parse .tf files for provider versions
