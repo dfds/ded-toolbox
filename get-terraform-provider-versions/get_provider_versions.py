@@ -218,6 +218,7 @@ contain HCL code."
             print_str = print_str.replace("\033[1m", "").replace("\033[0m", "")
         print(print_str)
         for provider in used_providers:
+            colour_code: str = ""
             if provider.comment == "Latest version will be used.":
                 colour_code = "\033[32m"
             if provider.comment == "Major version update available.":
