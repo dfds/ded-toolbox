@@ -10,6 +10,8 @@ boto3 = "^1.17.98"
 kubernetes = "^17.17.0"
 
 [tool.poetry.dev-dependencies]
+flake8 = "^3.9.2"
+black = "^21.6b0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
