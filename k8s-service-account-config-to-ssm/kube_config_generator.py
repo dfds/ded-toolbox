@@ -44,7 +44,7 @@ def create_k8s_kube_config(service_account_name: str, namespace: str) -> str:
     list_secrets = kube_api.list_namespaced_secret(SERVICE_ACCOUNT_NAMESPACE)
     for secret in list_secrets.items:
         if re.search(f"^{service_account_name}", secret.metadata.name):
-            kube_token_b64: str = secret.data["token"]
+            kube_token_b64 = secret.data["token"]
             break
 
     if kube_token_b64 != "":
