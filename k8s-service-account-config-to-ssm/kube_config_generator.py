@@ -39,6 +39,7 @@ def create_k8s_kube_config(service_account_name: str, namespace: str) -> str:
     """
     Create a string hold the kubeconfig definition.
     """
+    kube_token_b64: str = ""
     kube_api = client.CoreV1Api()
     list_secrets = kube_api.list_namespaced_secret(SERVICE_ACCOUNT_NAMESPACE)
     for secret in list_secrets.items:
