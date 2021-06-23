@@ -8,6 +8,7 @@ authors = ["Peter West <pwes@dfds.com>"]
 python = "^3.9"
 boto3 = "^1.17.98"
 kubernetes = "^17.17.0"
+python-dotenv = "^0.18.0"
 
 [tool.poetry.dev-dependencies]
 flake8 = "^3.9.2"
