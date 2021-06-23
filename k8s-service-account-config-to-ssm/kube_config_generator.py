@@ -7,10 +7,9 @@ import subprocess
 import logging
 from kubernetes import client, config
 from kubernetes.client.rest import ApiException
+from config import Config
 
 # define constants
-AWS_ROLE_CLOUD_ADMIN = "arn:aws:iam::738063116313:role/CloudAdmin"
-AWS_ROLE_ADFS_ADMIN = "arn:aws:iam::454234050858:role/ADFS-Admin"
 AWS_PARAMETER_NAME = "/managed/deploy/kube-config"
 AWS_PROFILE = "saml"
 AWS_REGION = "eu-central-1"
@@ -168,7 +167,9 @@ Parameters
 
 
 def main(argv):
-
+    config: Config = Config()
+    aws_role_cloud_admin: str = config.aws_role_cloud_admin
+    aws_role_adfs_admin: str = config.aws_role_adfs_admin
     account_id: str = ""
     root_id: str = ""
 
@@ -211,7 +212,7 @@ def main(argv):
     capability_aws_account_id = account_id
     capability_aws_role_arn = f"arn:aws:iam::{capability_aws_account_id}:role/OrgRole"
 
-    ret_val: bool = assume_saml_role(AWS_ROLE_CLOUD_ADMIN)
+    ret_val: bool = assume_saml_role(aws_role_cloud_admin)
     if ret_val:
         ret_val: bool = set_k8s_context(KUBERNETES_CONTEXT)
         if ret_val:
@@ -232,7 +233,7 @@ def main(argv):
                 )
 
                 # change saml role to ADFS Admin
-                ret_val: bool = assume_saml_role(AWS_ROLE_ADFS_ADMIN)
+                ret_val: bool = assume_saml_role(aws_role_adfs_admin)
 
                 if ret_val:
                     # retrieve credentials to assume role in the boto3 client
