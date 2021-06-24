@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "k8s-service-account-config-to-ssm"
+version = "1.0.0"
+description = "Creates a Service Account and Role Binding for the new capability and builds the kubeconfig before pushing it into the SSM Parameter Store."
+authors = ["Peter West <pwes@dfds.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+boto3 = "^1.17.98"
+kubernetes = "^17.17.0"
+python-dotenv = "^0.18.0"
+
+[tool.poetry.dev-dependencies]
+flake8 = "^3.9.2"
+black = "^21.6b0"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
