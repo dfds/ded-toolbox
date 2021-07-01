@@ -54,7 +54,7 @@ process {
 
         # Get user objects
         Write-Verbose "Searching for username '$Name'"
-        $Users = @(Get-ADUser -filter "SamAccountName -eq '$Name' -or UserPrincipalName -eq '$Name'" -Server "${Dc}:3268" -Properties Mail, MemberOf, CanonicalName)
+        $Users = @(Get-ADUser -filter "SamAccountName -eq '$Name' -or UserPrincipalName -eq '$Name' -or Mail -eq '$Name' -or Mail -like '${Name}@*'" -Server "${Dc}:3268" -Properties Mail, MemberOf, CanonicalName)
         Write-Verbose "$($Users.Count) user(s) found"
 
         ForEach ($User in $Users) {
