@@ -54,12 +54,19 @@ process {
 
         # Get user objects
         Write-Verbose "Searching for username '$Name'"
-        $Users = @(Get-ADUser -filter "SamAccountName -eq '$Name' -or UserPrincipalName -eq '$Name'" -Server "${Dc}:3268" -Properties Mail, MemberOf, CanonicalName)
+        $Users = @(Get-ADUser -filter "SamAccountName -eq '$Name' -or UserPrincipalName -eq '$Name' -or Mail -eq '$Name' -or Mail -like '${Name}@*'" -Server "${Dc}:3268" -Properties Mail, MemberOf, CanonicalName)
         Write-Verbose "$($Users.Count) user(s) found"
 
         ForEach ($User in $Users) {
 
             Write-Host "$($User.DistinguishedName)"
+
+            # Mail address is present
+            Write-TestDescription "User Principal Name field must be populated"
+            Switch ($User.UserPrincipalName) {
+                { $_ -match "^.*@\w*\.\w*" } { Write-TestResult -TestResult OK -ActualValue $_ }
+                Default { Write-TestResult -TestResult Problem -ActualValue $_ }
+            }
 
             # UPN suffix is @dfds.com
             Write-TestDescription "UPN suffix should be 'dfds.com'"
