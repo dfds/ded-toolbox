@@ -8,6 +8,10 @@ import logging
 from kubernetes import client, config
 from kubernetes.client.rest import ApiException
 from config import Config
+from mypy_boto3_sts import Client as stsclient
+from mypy_boto3_sts.type_defs import AssumeRoleResponseTypeDef
+from mypy_boto3_ssm import Client as ssmclient
+from mypy_boto3_ssm.type_defs import PutParameterResultTypeDef
 
 # define constants
 AWS_PARAMETER_NAME = "/managed/deploy/kube-config"
@@ -237,15 +241,15 @@ def main(argv):
 
                 if ret_val:
                     # retrieve credentials to assume role in the boto3 client
-                    boto_client = boto3.setup_default_session(region_name=AWS_REGION)
-                    boto_client = boto3.client("sts")
-                    response = boto_client.assume_role(
+                    boto3.setup_default_session(region_name=AWS_REGION)
+                    sts_client: stsclient = boto3.client("sts")
+                    response: AssumeRoleResponseTypeDef = sts_client.assume_role(
                         RoleArn=capability_aws_role_arn,
                         RoleSessionName=CAPABILITY_AWS_ROLE_SESSION,
                     )
 
                     # create boto3 client for SSM using assumed role credentials
-                    ssm_client = boto3.client(
+                    ssm_client: ssmclient = boto3.client(
                         "ssm",
                         aws_access_key_id=response["Credentials"]["AccessKeyId"],
                         aws_secret_access_key=response["Credentials"][
@@ -258,7 +262,7 @@ def main(argv):
                     )
                     try:
                         # create kubeconfig as an ssm parameter
-                        response = ssm_client.put_parameter(
+                        response: PutParameterResultTypeDef = ssm_client.put_parameter(
                             Name=AWS_PARAMETER_NAME,
                             Value=kube_config,
                             Type="SecureString",
