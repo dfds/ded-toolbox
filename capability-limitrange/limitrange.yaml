@@ -12,19 +12,10 @@ spec:
       defaultRequest:
         memory: 64Mi
         cpu: 20m
-      min:
-        cpu: 1m
-        memory: 1Mi
       max:
         memory: 4Gi
         cpu: 1000m
-      maxLimitRequestRatio:
-        cpu: 100
-        memory: 100
     - type: Pod
-      min:
-        cpu: 1m
-        memory: 1Mi
       max:
         memory: 4Gi
         cpu: 1000m

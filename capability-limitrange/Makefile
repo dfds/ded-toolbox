@@ -8,5 +8,5 @@ run:
 	poetry run python violate-limitranges.py
 
 lint:
-	poetry run python -m mypy .
-	poetry run python -m flake8 .
+	poetry run mypy .
+	poetry run flake8 .
